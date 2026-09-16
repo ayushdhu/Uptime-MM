@@ -2,8 +2,39 @@ import {launchCamera} from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 import {v4 as uuid} from 'uuid';
 import {PHOTO_DIR, ensureDirs, fileSize, sha256File} from './files';
-import {photos as photosRepo, syncQueue} from '../db/repositories';
+import {ensureCameraPermission, type PermissionOutcome} from './permissions';
+import {inspections as inspectionsRepo, photos as photosRepo, syncQueue} from '../db/repositories';
 import type {Photo} from '../domain/types';
+
+export type CaptureResult = {status: 'captured'; photo: Photo} | {status: 'cancelled'} | {status: 'permission_denied'; outcome: PermissionOutcome};
+
+export interface CaptureDeps {
+  ensurePermission: () => Promise<PermissionOutcome>;
+  capture: (inspectionId: string, itemId: string) => Promise<Photo | null>;
+}
+
+/**
+ * Entry point used by the walkthrough. Requests CAMERA at runtime right before
+ * the first photo (never at launch). When permission is refused nothing is
+ * written: no photo row, no file, and the inspection stays in_progress, so the
+ * walkthrough blocks on the photo requirement instead of silently continuing.
+ */
+export async function requestPhotoCapture(
+  inspectionId: string,
+  itemId: string,
+  deps: CaptureDeps = {ensurePermission: ensureCameraPermission, capture: capturePhoto},
+): Promise<CaptureResult> {
+  const inspection = inspectionsRepo.find(inspectionId);
+  if (!inspection || inspection.status === 'locked') {
+    throw new Error('Inspection is locked and cannot be changed. Add a note instead.');
+  }
+  const outcome = await deps.ensurePermission();
+  if (outcome !== 'granted') {
+    return {status: 'permission_denied', outcome};
+  }
+  const photo = await deps.capture(inspectionId, itemId);
+  return photo ? {status: 'captured', photo} : {status: 'cancelled'};
+}
 
 /**
  * Capture a photo for an inspection item: opens the camera, copies the file

@@ -6,7 +6,7 @@ import {Button, Card, Input, Label, Muted, Screen, Title, colors} from '../compo
 import {customers as customersRepo, machines as machinesRepo, templates as templatesRepo} from '../db/repositories';
 import {deriveEmissionsTier, selectTemplate} from '../domain/checklist';
 import type {DriveType, MachineClass} from '../domain/types';
-import {writeMachineId} from '../services/nfc';
+import {cancelTagWrite, nfcStatus, readTagIdOnce, writeMachineId, type WritePhase} from '../services/nfc';
 import {startInspection} from '../services/inspectionFlow';
 import {useApp} from '../state/AppContext';
 import type {RootStackParamList} from '../navigation/types';
@@ -38,6 +38,7 @@ export function SetupWizardScreen() {
   const [hoursPerWeek, setHoursPerWeek] = useState('');
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [tagId, setTagId] = useState<string | null>(params.tagId ?? null);
+  const [tagPhase, setTagPhase] = useState<WritePhase | 'idle' | 'nfc_off'>('idle');
   const [busy, setBusy] = useState(false);
   const customers = useMemo(() => customersRepo.all(), []);
 
@@ -78,14 +79,50 @@ export function SetupWizardScreen() {
     setStep(s => Math.min(s + 1, STEPS.length - 1));
   };
 
-  const writeTag = async () => {
-    // We do not know the Unique Machine ID until the server creates the row, so
-    // the tag UID is read now and the NDEF payload is written after creation.
-    const id = await writeMachineId('pending');
-    if (id) {
-      setTagId(id);
-    } else {
-      Alert.alert('NFC unavailable', 'Skip for now and link a tag later from the machine screen.');
+  // Android: the tag must be in range at the moment of the write. Step 9 reads the
+  // tag UID now (waiting for a tap); the NDEF payload with the Unique Machine ID is
+  // written after the server creates the row, again while the tag is held in place.
+  const readTag = async () => {
+    if ((await nfcStatus()) !== 'ready') {
+      setTagPhase('nfc_off');
+      return;
+    }
+    setTagPhase('waiting');
+    try {
+      const id = await readTagIdOnce();
+      if (id) {
+        setTagId(id);
+        setTagPhase('done');
+      } else {
+        setTagPhase('error');
+      }
+    } catch {
+      setTagPhase('error');
+    }
+  };
+
+  const writeTagAfterCreate = async (machineId: string): Promise<void> => {
+    for (;;) {
+      try {
+        const written = await new Promise<string | null>((resolve, reject) => {
+          setTagPhase('waiting');
+          writeMachineId(machineId, setTagPhase).then(resolve, reject);
+        });
+        if (written) {
+          return;
+        }
+      } catch {
+        // fall through to retry prompt
+      }
+      const retry = await new Promise<boolean>(resolve =>
+        Alert.alert('Tag not written', 'Hold the tag flat against the back of the tablet and try again.', [
+          {text: 'Skip for now', style: 'cancel', onPress: () => resolve(false)},
+          {text: 'Retry', onPress: () => resolve(true)},
+        ]),
+      );
+      if (!retry) {
+        return;
+      }
     }
   };
 
@@ -124,7 +161,8 @@ export function SetupWizardScreen() {
         return;
       }
       if (tagId) {
-        await writeMachineId(machine.id).catch(() => null);
+        await writeTagAfterCreate(machine.id);
+        setTagPhase('idle');
       }
       // The baseline is the first walkthrough; it starts now.
       const inspection = startInspection({machineId: machine.id, technician: user, deviceId, hourMeter: parseInt(hourMeter, 10), type: 'baseline'});
@@ -198,8 +236,32 @@ export function SetupWizardScreen() {
           {step === 7 && choice(customers.map(c => ({v: c.id, label: c.name})), customerId, setCustomerId)}
           {step === 8 && (
             <>
-              <Muted>{tagId ? `Tag ${tagId} will be linked.` : 'No tag yet. Write one now or skip and link it later.'}</Muted>
-              <Button title="Write and link NFC tag" kind="secondary" onPress={writeTag} />
+              {tagPhase === 'waiting' || tagPhase === 'writing' ? (
+                <View style={styles.holdBox}>
+                  <Text style={styles.holdText}>{tagPhase === 'writing' ? 'Writing… keep the tag still' : 'Hold the tag flat against the back of the tablet'}</Text>
+                  <Button
+                    title="Cancel"
+                    kind="ghost"
+                    onPress={() => {
+                      cancelTagWrite();
+                      setTagPhase('idle');
+                    }}
+                  />
+                </View>
+              ) : (
+                <>
+                  <Muted>
+                    {tagId
+                      ? `Tag ${tagId} read. Its Unique Machine ID is written when the machine is created (keep the tag handy).`
+                      : tagPhase === 'nfc_off'
+                        ? 'NFC is switched off or unavailable. Turn it on, or skip and link a tag later from the machine screen.'
+                        : tagPhase === 'error'
+                          ? 'Could not read the tag. Try again, holding it still against the tablet.'
+                          : 'No tag yet. Read one now or skip and link it later.'}
+                  </Muted>
+                  <Button title={tagId ? 'Read a different tag' : tagPhase === 'error' ? 'Retry' : 'Read NFC tag'} kind="secondary" onPress={readTag} />
+                </>
+              )}
             </>
           )}
           {step === 9 && (
@@ -235,4 +297,6 @@ const styles = StyleSheet.create({
   choiceText: {fontSize: 18, fontWeight: '600', color: colors.text},
   templateText: {fontSize: 18, fontWeight: '600', color: colors.text, marginBottom: 8},
   nav: {flexDirection: 'row', gap: 12},
+  holdBox: {alignItems: 'center', padding: 24, borderWidth: 2, borderColor: colors.primary, borderRadius: 12, borderStyle: 'dashed'},
+  holdText: {fontSize: 20, fontWeight: '700', color: colors.primary, textAlign: 'center', marginBottom: 8},
 });

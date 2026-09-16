@@ -1,5 +1,5 @@
 import React from 'react';
-import {ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View, type TextInputProps, type ViewStyle} from 'react-native';
+import {ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle} from 'react-native';
 import type {Severity} from '../domain/types';
 
 export const colors = {
@@ -16,11 +16,11 @@ export const colors = {
   fail: '#B3261E',
 };
 
-export function Screen({children, style}: {children?: React.ReactNode; style?: ViewStyle}) {
+export function Screen({children, style}: {children?: React.ReactNode; style?: StyleProp<ViewStyle>}) {
   return <View style={[styles.screen, style]}>{children}</View>;
 }
 
-export function Card({children, style, pointerEvents}: {children?: React.ReactNode; style?: ViewStyle; pointerEvents?: 'auto' | 'none'}) {
+export function Card({children, style, pointerEvents}: {children?: React.ReactNode; style?: StyleProp<ViewStyle>; pointerEvents?: 'auto' | 'none'}) {
   return (
     <View style={[styles.card, style]} pointerEvents={pointerEvents}>
       {children}
@@ -88,7 +88,7 @@ export function TierButtons({value, onChange}: {value: Severity | null; onChange
           accessibilityState={{selected: value === t.s}}
           onPress={() => onChange(t.s)}
           style={[styles.tier, {flex: t.flex, borderColor: colors[t.s], backgroundColor: value === t.s ? colors[t.s] : '#fff'}]}>
-          <Text style={[styles.tierText, {color: value === t.s ? '#fff' : colors[t.s], fontSize: t.s === 'high' ? 24 : 18}]}>{t.label}</Text>
+          <Text style={[styles.tierText, {color: value === t.s ? '#fff' : colors[t.s], fontSize: t.s === 'high' ? 28 : 20}]}>{t.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -146,17 +146,18 @@ const styles = StyleSheet.create({
   title: {fontSize: 26, fontWeight: '700', color: colors.text, marginBottom: 10},
   label: {fontSize: 14, fontWeight: '600', color: colors.muted, marginTop: 10, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5},
   muted: {fontSize: 14, color: colors.muted},
-  button: {paddingVertical: 14, paddingHorizontal: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginTop: 8, minHeight: 50},
+  button: {paddingVertical: 14, paddingHorizontal: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginTop: 8, minHeight: 56},
   buttonText: {fontSize: 17, fontWeight: '600'},
   input: {borderWidth: 1, borderColor: colors.border, borderRadius: 10, padding: 12, fontSize: 17, backgroundColor: '#fff', color: colors.text},
   row: {flexDirection: 'row', gap: 12, marginTop: 8},
-  tier: {borderWidth: 3, borderRadius: 12, paddingVertical: 22, alignItems: 'center', justifyContent: 'center'},
+  // Gloved / wet-hand use: every grading target is at least 96dp tall. HIGH is wider and louder.
+  tier: {borderWidth: 3, borderRadius: 12, paddingVertical: 26, minHeight: 96, alignItems: 'center', justifyContent: 'center'},
   tierText: {fontSize: 18, fontWeight: '800', letterSpacing: 1},
   progressWrap: {marginBottom: 12},
   progressTrack: {height: 10, backgroundColor: '#E1E5EC', borderRadius: 5, overflow: 'hidden'},
   progressFill: {height: 10, backgroundColor: colors.primary},
   progressText: {marginTop: 4, color: colors.muted, fontSize: 13},
-  checkRow: {flexDirection: 'row', alignItems: 'center', paddingVertical: 10},
-  checkBox: {width: 28, height: 28, borderWidth: 2, borderColor: colors.border, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginRight: 12},
+  checkRow: {flexDirection: 'row', alignItems: 'center', paddingVertical: 14, minHeight: 56},
+  checkBox: {width: 36, height: 36, borderWidth: 2, borderColor: colors.border, borderRadius: 6, alignItems: 'center', justifyContent: 'center', marginRight: 12},
   checkLabel: {fontSize: 17, color: colors.text, flex: 1},
 });

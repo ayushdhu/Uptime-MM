@@ -92,15 +92,27 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        // Release keystore lives OUTSIDE the repository (see app/README.md). Provide it via
+        // ~/.gradle/gradle.properties or environment variables; never commit it.
+        release {
+            def storePath = project.findProperty('UPTIME_RELEASE_STORE_FILE') ?: System.getenv('UPTIME_RELEASE_STORE_FILE')
+            if (storePath) {
+                storeFile file(storePath)
+                storePassword project.findProperty('UPTIME_RELEASE_STORE_PASSWORD') ?: System.getenv('UPTIME_RELEASE_STORE_PASSWORD')
+                keyAlias project.findProperty('UPTIME_RELEASE_KEY_ALIAS') ?: System.getenv('UPTIME_RELEASE_KEY_ALIAS') ?: 'uptime'
+                keyPassword project.findProperty('UPTIME_RELEASE_KEY_PASSWORD') ?: System.getenv('UPTIME_RELEASE_KEY_PASSWORD')
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // Signed with the release keystore when UPTIME_RELEASE_STORE_FILE is configured
+            // (see app/README.md); otherwise the debug key so a local assembleRelease still
+            // installs. Never distribute a debug-signed build.
+            signingConfig signingConfigs.release.storeFile ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }

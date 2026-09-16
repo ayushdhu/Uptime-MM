@@ -1,14 +1,20 @@
 import RNFS from 'react-native-fs';
 import type {FileSystem} from '../sync/engine';
 
-/** App private storage (never the camera roll). */
-export const PHOTO_DIR = `${RNFS.DocumentDirectoryPath}/uptime/photos`;
-export const SIGNATURE_DIR = `${RNFS.DocumentDirectoryPath}/uptime/signatures`;
+/**
+ * App private storage root. RNFS.DocumentDirectoryPath is the platform-correct
+ * private directory: on Android it is Context.getFilesDir() (internal storage,
+ * not the gallery, not external storage, removed with the app). Every photo and
+ * signature path derives from this one constant.
+ */
+export const APP_PRIVATE_DIR = `${RNFS.DocumentDirectoryPath}/uptime`;
+export const PHOTO_DIR = `${APP_PRIVATE_DIR}/photos`;
+export const SIGNATURE_DIR = `${APP_PRIVATE_DIR}/signatures`;
 
 export async function ensureDirs(): Promise<void> {
   for (const dir of [PHOTO_DIR, SIGNATURE_DIR]) {
     if (!(await RNFS.exists(dir))) {
-      await RNFS.mkdir(dir, {NSURLIsExcludedFromBackupKey: false});
+      await RNFS.mkdir(dir);
     }
   }
 }

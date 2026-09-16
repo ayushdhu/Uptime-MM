@@ -1,7 +1,7 @@
 buildscript {
     ext {
         buildToolsVersion = "37.0.0"
-        minSdkVersion = 24
+        minSdkVersion = 26 // Android 8.0+: reliable foreground NFC dispatch and StatFs.getFreeBytes
         compileSdkVersion = 37
         targetSdkVersion = 36
         ndkVersion = "27.1.12297006"

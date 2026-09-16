@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useState} from 'react';
-import {Alert, Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Alert, Image, Linking, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {useFocusEffect, useNavigation, useRoute, type RouteProp} from '@react-navigation/native';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {Button, Card, Input, Label, Muted, PassFailButtons, ProgressBar, Screen, TierButtons, colors} from '../components/ui';
@@ -7,7 +7,8 @@ import {inspections as inspectionsRepo, items as itemsRepo, photos as photosRepo
 import {itemCompletionError, forcedSeverity} from '../domain/checklist';
 import type {InspectionItem, MeasurementDetail, Photo, Severity, TemplateItem} from '../domain/types';
 import {gradeItem, markItemDone, pendingHighItems, skipItem, templateItemByKey} from '../services/inspectionFlow';
-import {capturePhoto, photoUri} from '../services/photos';
+import {photoUri, requestPhotoCapture} from '../services/photos';
+import {CAMERA_BLOCKED_MESSAGE} from '../services/permissions';
 import type {RootStackParamList} from '../navigation/types';
 
 /** One item per screen, in template order. Photo first, then the result controls unlock (spec 5.3). */
@@ -23,6 +24,7 @@ export function WalkthroughScreen() {
   const [showSkip, setShowSkip] = useState(false);
   const [measure, setMeasure] = useState('');
   const [detail, setDetail] = useState<MeasurementDetail>({});
+  const [cameraBlocked, setCameraBlocked] = useState(false);
   const templates = useMemo(() => (inspection ? templateItemByKey(inspection) : new Map<string, TemplateItem>()), [inspection]);
 
   const loadItem = useCallback(
@@ -79,8 +81,14 @@ export function WalkthroughScreen() {
 
   const takePhoto = async () => {
     try {
-      const p = await capturePhoto(inspection.client_generated_id, item.client_generated_id);
-      if (p) {
+      const result = await requestPhotoCapture(inspection.client_generated_id, item.client_generated_id);
+      if (result.status === 'permission_denied') {
+        // A photo is required on every item: block here, keep the inspection in_progress.
+        setCameraBlocked(true);
+        return;
+      }
+      setCameraBlocked(false);
+      if (result.status === 'captured') {
         setPhotos(photosRepo.forItem(item.client_generated_id));
       }
     } catch (e) {
@@ -178,6 +186,16 @@ export function WalkthroughScreen() {
           ) : null}
         </Card>
 
+        {cameraBlocked ? (
+          <Card style={styles.blocked}>
+            <Text style={styles.blockedTitle}>Camera access needed</Text>
+            <Text style={styles.blockedText}>{CAMERA_BLOCKED_MESSAGE}</Text>
+            <View style={styles.nav}>
+              <Button title="Open app settings" kind="secondary" onPress={() => Linking.openSettings()} style={styles.flex1} />
+              <Button title="Try again" onPress={takePhoto} style={styles.flex1} />
+            </View>
+          </Card>
+        ) : null}
         <Card>
           <Label>Photos ({photos.length}) — required before grading</Label>
           <ScrollView horizontal style={{marginBottom: 8}}>
@@ -303,4 +321,8 @@ const styles = StyleSheet.create({
   forced: {color: colors.high, fontWeight: '700', marginTop: 8},
   nav: {flexDirection: 'row', gap: 12},
   row3: {flexDirection: 'row', gap: 8, marginTop: 4},
+  flex1: {flex: 1},
+  blocked: {borderColor: colors.high, borderWidth: 2},
+  blockedTitle: {fontSize: 18, fontWeight: '800', color: colors.high},
+  blockedText: {fontSize: 15, color: colors.text, marginTop: 6},
 });

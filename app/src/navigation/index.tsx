@@ -1,5 +1,5 @@
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {NavigationContainer, createNavigationContainerRef} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {ActivityIndicator, View} from 'react-native';
 import type {RootStackParamList} from './types';
@@ -16,11 +16,43 @@ import {CheckoutScreen} from '../screens/CheckoutScreen';
 import {ReportScreen} from '../screens/ReportScreen';
 import {InspectionDetailScreen} from '../screens/InspectionDetailScreen';
 import {PhotoBrowserScreen} from '../screens/PhotoBrowserScreen';
+import {getLaunchTagId} from '../services/nfc';
+import {resolveTag} from '../services/tagResolution';
+
+export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
-  const {ready, user} = useApp();
+  const {ready, user, api, sync} = useApp();
+
+  // Launched by a tag scan (cold start with an NFC intent): route straight to the machine.
+  useEffect(() => {
+    if (!ready || !user) {
+      return;
+    }
+    (async () => {
+      const tagId = await getLaunchTagId();
+      if (!tagId) {
+        return;
+      }
+      const res = await resolveTag(tagId, api, sync.online);
+      const go = () => {
+        if (!navigationRef.isReady()) {
+          setTimeout(go, 100);
+          return;
+        }
+        if (res.kind === 'machine') {
+          navigationRef.navigate('Machine', {machineId: res.machine.id});
+        } else {
+          navigationRef.navigate('UnregisteredTag', {tagId});
+        }
+      };
+      go();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, user]);
+
   if (!ready) {
     return (
       <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
@@ -29,7 +61,7 @@ export function RootNavigator() {
     );
   }
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator screenOptions={{headerBackTitle: 'Back'}}>
         {!user ? (
           <Stack.Screen name="Login" component={LoginScreen} options={{headerShown: false}} />

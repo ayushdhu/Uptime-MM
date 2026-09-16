@@ -6,7 +6,8 @@ import {Button, Card, Input, Muted, Screen, Title, colors} from '../components/u
 import {SyncBar} from '../components/SyncBar';
 import {customers as customersRepo, machines as machinesRepo} from '../db/repositories';
 import type {Machine} from '../domain/types';
-import {readTagId} from '../services/nfc';
+import {nfcStatus, openNfcSettings, subscribeToTags, type NfcStatus} from '../services/nfc';
+import {resolveTag} from '../services/tagResolution';
 import {useApp} from '../state/AppContext';
 import type {RootStackParamList} from '../navigation/types';
 
@@ -17,40 +18,45 @@ export function HomeScreen() {
   const {user, logout, refreshSyncStatus, sync, api} = useApp();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Machine[]>([]);
-  const [scanning, setScanning] = useState(false);
+  const [nfc, setNfc] = useState<NfcStatus>('ready');
+  const [resolving, setResolving] = useState(false);
 
+  const onTag = useCallback(
+    async (tagId: string) => {
+      setResolving(true);
+      try {
+        const res = await resolveTag(tagId, api, sync.online);
+        if (res.kind === 'machine') {
+          nav.navigate('Machine', {machineId: res.machine.id});
+        } else {
+          nav.navigate('UnregisteredTag', {tagId});
+        }
+      } finally {
+        setResolving(false);
+      }
+    },
+    [api, sync.online, nav],
+  );
+
+  // Android delivers tag intents to the foreground activity: listen while this
+  // screen is focused, release on blur so other screens (tag writing) can use NFC.
   useFocusEffect(
     useCallback(() => {
       refreshSyncStatus();
       setResults(query ? machinesRepo.search(query) : machinesRepo.all().slice(0, 30));
-    }, [refreshSyncStatus, query]),
+      const unsubscribe = subscribeToTags(onTag, setNfc);
+      return unsubscribe;
+    }, [refreshSyncStatus, query, onTag]),
   );
 
-  const scan = async () => {
-    setScanning(true);
-    try {
-      const tagId = await readTagId();
-      if (!tagId) {
-        Alert.alert('NFC unavailable', 'Could not read a tag. Search by serial number instead.');
-        return;
-      }
-      let machine = machinesRepo.byNfc(tagId);
-      if (!machine && sync.online) {
-        try {
-          const res = await api.lookupMachine({nfc: tagId});
-          machine = res.data as Machine;
-          machinesRepo.upsert(machine);
-        } catch {
-          machine = null;
-        }
-      }
-      if (machine) {
-        nav.navigate('Machine', {machineId: machine.id});
-      } else {
-        nav.navigate('UnregisteredTag', {tagId});
-      }
-    } finally {
-      setScanning(false);
+  const recheckNfc = async () => {
+    const status = await nfcStatus();
+    setNfc(status);
+    if (status === 'disabled') {
+      Alert.alert('NFC is switched off', 'Turn NFC on in system settings to open machines by tag, or search by serial number below.', [
+        {text: 'Search instead'},
+        {text: 'Open settings', onPress: () => openNfcSettings()},
+      ]);
     }
   };
 
@@ -68,8 +74,19 @@ export function HomeScreen() {
           <Muted>{user?.name}</Muted>
         </Pressable>
       </View>
-      <Button title={scanning ? 'Hold iPad near tag…' : 'Tap NFC tag'} onPress={scan} loading={scanning} />
-      <Input value={query} onChangeText={search} placeholder="Serial number or customer name" autoCapitalize="characters" style={{marginTop: 12}} />
+      {nfc === 'ready' ? (
+        <Card style={styles.nfcCard}>
+          <Text style={styles.nfcText}>{resolving ? 'Looking up tag…' : 'Hold the tablet against the machine tag to open it'}</Text>
+        </Card>
+      ) : (
+        <Card style={[styles.nfcCard, styles.nfcOff]}>
+          <Text style={styles.nfcText}>
+            {nfc === 'disabled' ? 'NFC is switched off on this tablet. Search by serial number, or turn NFC on.' : 'This tablet has no NFC reader. Search by serial number.'}
+          </Text>
+          {nfc === 'disabled' ? <Button title="Turn on NFC" kind="secondary" onPress={recheckNfc} /> : null}
+        </Card>
+      )}
+      <Input value={query} onChangeText={search} placeholder="Serial number or customer name" autoCapitalize="characters" style={styles.search} />
       <FlatList
         data={results}
         keyExtractor={m => m.id}
@@ -95,5 +112,9 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   headerRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
+  nfcCard: {borderColor: colors.primary, borderWidth: 2, alignItems: 'center'},
+  nfcOff: {borderColor: colors.medium},
+  nfcText: {fontSize: 17, fontWeight: '600', color: colors.text, textAlign: 'center'},
+  search: {marginTop: 4},
   serial: {fontSize: 18, fontWeight: '700', color: colors.text},
 });

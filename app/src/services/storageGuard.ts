@@ -20,8 +20,18 @@ export function judgeFreeSpace(freeBytes: number): StorageVerdict {
   return {level: 'ok', freeBytes, message: `${gb} GB free.`};
 }
 
-/** Spec 7.8: warn below 2 GB, block below 500 MB, before starting a walkthrough. */
+/**
+ * Spec 7.8: warn below 2 GB, block below 500 MB, before starting a walkthrough.
+ * On Android RNFS.getFSInfo() reads StatFs(Environment.getDataDirectory()).getFreeBytes(),
+ * i.e. bytes free on the internal partition that holds filesDir, where photos are
+ * written. `freeSpaceEx` (external storage) is deliberately ignored.
+ */
 export async function checkFreeSpace(): Promise<StorageVerdict> {
   const info = await RNFS.getFSInfo();
-  return judgeFreeSpace(Number(info.freeSpace));
+  const free = Number(info.freeSpace);
+  if (!Number.isFinite(free) || free < 0) {
+    // A broken reading must not silently disable the guard.
+    return {level: 'block', freeBytes: 0, message: 'Could not read free storage space. Sync and restart the app before starting a walkthrough.'};
+  }
+  return judgeFreeSpace(free);
 }
