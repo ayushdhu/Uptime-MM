@@ -1,0 +1,165 @@
+# GENERATED from the PM checklist workbook by docs/checklists/xlsx_to_yaml.py.
+# Edit the workbook (or this file deliberately), then re-seed. Published templates are immutable:
+# a content change must ship as a new `version`.
+criteria:
+  Criteria Key:
+    applies_to: Applies To
+    low: Low
+    medium: Medium
+    high: High
+  hose:
+    applies_to: Hoses (all hydraulic and engine hoses)
+    low: >-
+      Minor surface discoloration or light abrasion on outer sleeve. No active leak, no cracking.
+    medium: >-
+      Visible cracking or abrasion partway through outer layer, or occasional weeping under load (not
+      a steady drip).
+    high: >-
+      Steady active leak, dripping or pooling under load, OR cracking through to exposed inner braiding
+      or metal. Visible continuous leakage is High even without exposed metal.
+  belt:
+    applies_to: Belts (drive, PTO, AC, alternator, fan)
+    low: Light glazing or minor surface cracking, still flexible, no fraying.
+    medium: Visible cracking across belt face or minor edge fraying, still holding tension.
+    high: >-
+      Heavy fraying with visible missing chunks, slipping or squealing under load, or cracking deep enough
+      to risk snapping.
+  tire:
+    applies_to: Tires (pressure logged every visit; 1 min / 5 min refill test)
+    low: >-
+      Pressure in normal range, minor tread wear or small surface cuts, no exposed cord or steel belting.
+    medium: >-
+      Consistent visit over visit pressure loss in the logged readings (slow leak pattern) even if tire
+      looks fine, OR tread near wear indicator, OR cuts exposing some cord/belting without full breach,
+      still holding air.
+    high: >-
+      Refill test: fill tire, read psi at 1 minute, read again at 5 minutes. Any drop from the 1 minute
+      reading = active leak = High. Also High for exposed cord/steel, sidewall damage, or tire not holding
+      air.
+  battery:
+    applies_to: Battery (voltmeter every visit; 12.6 V ref on 12 V, 25.2 V on 24 V)
+    low: >-
+      Light surface terminal corrosion, solid contact, no swelling or case damage. Voltmeter at or near
+      full charge (12.6 V on 12 V system, 25.2 V on 24 V system).
+    medium: >-
+      Moderate terminal corrosion or loose mount, plus a voltage reading that is low or borderline against
+      the reference (underperforming, not dead).
+    high: >-
+      Tester reads battery low, dead, or bad (cannot crank, losing charge, not holding alternator charge).
+      Automatic High regardless of root cause. Treat as a larger red flag on 24 V and 48 V systems (cascading
+      failure risk).
+  elec:
+    applies_to: Electrical connections and harness
+    low: >-
+      Sleeve or jacket surface wear only, no corrosion, nothing broken, wiring fully intact underneath.
+    medium: Exposed wiring visible through compromised sleeve, not yet bare copper.
+    high: Bare copper wire showing through the jacket.
+  cyl:
+    applies_to: Hydraulic cylinders (all)
+    low: >-
+      Visual wetness or dampness on cylinder surface (minor seal weep). Rod clean, no pitting or scoring.
+    medium: >-
+      Visible scratching or slight pitting on the cylinder rod, no leak beyond the same minor wetness.
+    high: >-
+      Damage to the cylinder body itself, or an extreme leak from the end cap with fluid drops actively
+      forming and falling.
+  pins:
+    applies_to: Pins, bushings, grease points
+    low: >-
+      Grease still visible at points, only minor surface wear on arms. Flagged to keep greasing on schedule.
+    medium: No grease left at points, minor visual dryness on bushings plus patchy wear.
+    high: >-
+      No grease at any point plus heavy scratching, dryness, or cracking on the bushing itself.
+  fluid:
+    applies_to: >-
+      Fluid levels and reservoirs (engine oil, coolant, hydraulic, transmission, axle, swing gear, pivot
+      shaft)
+    low: Level at full mark, no leaks.
+    medium: >-
+      Level low but above minimum, or slight weeping at a seal or fitting. Top off and log.
+    high: >-
+      Active leak, or level critically low / below minimum. Investigate any sudden drop immediately.
+  filter:
+    applies_to: Filters (fuel, air, hydraulic, oil, cabin, transmission)
+    low: >-
+      Filter within service life, no leaks at housing, restriction indicator (if fitted) clear.
+    medium: >-
+      Filter life at 50 percent or below (roughly halfway through the change interval). Still functional;
+      owner may choose early replacement.
+    high: >-
+      Filter past its change interval, restriction indicator tripped, housing leaking, or no change date
+      on file and none legible on the filter (offer filter change as separate signed add on).
+  lug:
+    applies_to: Lug nuts / wheel bolts / stem caps
+    low: All lug nuts / wheel bolts fully torqued, stem caps present.
+    medium: One or more loose lug nuts found and retorqued, or missing stem cap.
+    high: Any lug nut or wheel bolt backed out significantly or missing.
+  fins:
+    applies_to: Fin blockage (radiator, oil cooler, AC condenser, screens)
+    low: Fins clean, no blockage, no leaks.
+    medium: Partial debris buildup reducing airflow. Clear during visit.
+    high: >-
+      Heavily packed fins (overheating risk), bent fins over a large area, or any coolant / oil leak at
+      the core.
+  frame:
+    applies_to: Frame and structural members
+    low: No visible cracks or damage, cosmetic paint wear only.
+    medium: Surface rust or minor dents that do not affect structural integrity.
+    high: Any visible crack, weld separation, or bend in the frame or arms.
+  welds:
+    applies_to: Welds at high load points
+    low: No stress marks or hairline cracking visible at welds or mounts.
+    medium: Hairline stress crack visible at a weld or mount point, not yet propagating.
+    high: >-
+      Crack propagating through a weld, or any crack at a boom mount or axle mount. Stop use flag.
+  leak:
+    applies_to: Generic leak check (seals, drives, tanks)
+    low: Dry, no leaks.
+    medium: Minor seepage or weeping.
+    high: Active leak (dripping or pooling).
+  get:
+    applies_to: Ground engaging tools (bucket teeth, adapters, ripper GET)
+    low: Minor rounding, cutting edge still functional.
+    medium: Noticeable wear reducing digging efficiency, uneven wear pattern.
+    high: Teeth worn down to the adapter, missing teeth, or adapter itself damaged.
+  edge:
+    applies_to: Cutting edges / moldboards
+    low: Light edge wear, edge straight.
+    medium: Uneven wear or moderate rounding, cutting performance starting to suffer.
+    high: Worn through to mounting bolts, heavily chipped, or moldboard bent or cracked.
+  play:
+    applies_to: Mechanical play (trunnions, hitches, idlers, axle pivots)
+    low: No play, tight.
+    medium: Minor detectable play.
+    high: Significant play or visible damage.
+  trk_bolts:
+    applies_to: 'Tracks: shoe bolts / chain tension'
+    low: Occasional loose shoe bolt caught and tightened, not recurring.
+    medium: >-
+      Recurring loose bolts needing regular retorque, or chain sag beyond normal range not yet causing
+      sprocket jump.
+    high: >-
+      Any leaking seal, damaged or broken roller, or visible sprocket jump from excessive chain sag.
+  trk_sprocket:
+    applies_to: 'Tracks: sprocket teeth / chain wear'
+    low: Teeth mostly flat, light wear, edges just starting to sharpen.
+    medium: Higher degree of sharpness developing on teeth.
+    high: Sharp or pointed teeth.
+  trk_roller:
+    applies_to: 'Tracks: rollers'
+    low: Light abrasion.
+    medium: Mild to medium abrasion.
+    high: Flat spot or close to it.
+  trk_rubber:
+    applies_to: 'Tracks: rubber track condition'
+    low: Light tearing or scuffing.
+    medium: Small tears or loose cords in isolated areas.
+    high: >-
+      Torn or cut edges extending across the track (side to side or into the middle) or exposed cording.
+      Imminent failure.
+  trk_debris:
+    applies_to: 'Tracks / final drive: debris'
+    low: Light debris.
+    medium: Heavier debris accumulation.
+    high: >-
+      Caked or packed debris, especially before winter (freeze expansion can blow apart rubber tracks).

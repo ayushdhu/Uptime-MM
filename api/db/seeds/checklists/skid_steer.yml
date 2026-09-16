@@ -1,0 +1,748 @@
+# GENERATED from the PM checklist workbook by docs/checklists/xlsx_to_yaml.py.
+# Edit the workbook (or this file deliberately), then re-seed. Published templates are immutable:
+# a content change must ship as a new `version`.
+machine_class: skid_steer
+drive_type: null
+has_def: null
+version: alpha-2
+source: uptime_pm_checklists_alpha1.xlsx / tab 'Skid Steer'
+items:
+- key: machine_body_frame
+  component: Machine body / frame
+  section: Exterior
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: frame
+  measurement: null
+  notes_to_tech: null
+- key: connection_parts_hardware_bolts_fasteners
+  component: Connection parts / hardware (bolts, fasteners)
+  section: Exterior
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Visual (no tug test on skid steer, access too tight)
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: All hardware present and tight, cosmetic wear only.
+    medium: One or more loose fasteners found and tightened.
+    high: Missing or broken hardware, or fastener that will not hold torque.
+  measurement: null
+  notes_to_tech: null
+- key: quick_attach_coupler_mechanism
+  component: Quick attach / coupler mechanism
+  section: Exterior
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Visual + function
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: Locks fully, pins seat, light wear on wedges.
+    medium: Pins seat but with noticeable play or worn wedges, still locks.
+    high: Will not fully lock, bent or cracked plate, or pin does not seat.
+  measurement: null
+  notes_to_tech: null
+- key: hydraulic_hoses_arm_aux_drive
+  component: Hydraulic hoses (arm, aux, drive)
+  section: Hydraulics
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual, full length incl. behind cylinder mounts
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: hose
+  measurement: null
+  notes_to_tech: 'Shared: Hoses. Tighten fittings.'
+- key: hose_fitting_seals_flat_faced_o_rings
+  component: Hose fitting seals / flat faced O rings
+  section: Hydraulics
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: leak
+  measurement: null
+  notes_to_tech: 'Shared: Leak. Stock flat faced O rings, common winter leak point.'
+- key: hydraulic_cylinders_lift_tilt_aux
+  component: Hydraulic cylinders (lift, tilt, aux)
+  section: Hydraulics
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: cyl
+  measurement: null
+  notes_to_tech: 'Shared: Hydraulic cylinder.'
+- key: hydraulic_arm_seals
+  component: Hydraulic arm seals
+  section: Hydraulics
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: leak
+  measurement: null
+  notes_to_tech: 'Shared: Leak.'
+- key: lift_arms_pins_and_bushings_grease_points_pivot_pins_lift_ar
+  component: >-
+    Lift arms / pins and bushings / grease points (pivot pins, lift arms, cylinders, bucket hinge pins)
+  section: Hydraulics
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual + grease all points
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: pins
+  measurement: null
+  notes_to_tech: >-
+    Shared: Pins and bushings. Bearings on arm pins covered here. Note unusual noise or binding.
+- key: hydraulic_oil_level
+  component: Hydraulic oil level
+  section: Fluids
+  walkthrough_group: Exterior / Structural
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: fluid_level
+  check_method_label: Sight glass / dipstick
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: >-
+    Shared: Fluid level. Top off with hydraulic oil. Sudden drop = investigate now (pump failure risk).
+- key: hydraulic_system_in_depth_lines_under_cab_pump_area
+  component: Hydraulic system in depth (lines under cab, pump area)
+  section: Hydraulics
+  walkthrough_group: Exterior / Structural
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: hose
+  measurement: null
+  notes_to_tech: Monthly deeper pass.
+- key: tires_wheeled_models_pressure_reading_each_tire
+  component: 'Tires (wheeled models): pressure reading each tire'
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Gauge, log psi per tire
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: tire
+  measurement:
+    unit: psi
+    reference: null
+    flow: tire_refill_test
+  applies_when:
+    drive_type: wheeled
+  notes_to_tech: >-
+    Shared: Tires. Log what machine was lifting between checks so patterns can be separated from a puncture.
+- key: tracks_loose_shoe_bolts_chain_tension_steel_tracks
+  component: 'Tracks: loose shoe bolts / chain tension (steel tracks)'
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Visual + physical
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_bolts
+  measurement: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: >-
+    Shared: Tracks. Retorque shoe bolts every 100 hr. Keep roller seals greased and tracks washed.
+- key: tracks_sprocket_teeth
+  component: 'Tracks: sprocket teeth'
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_sprocket
+  measurement: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: 'Shared: Tracks.'
+- key: tracks_chain_and_linkage_wear_sprocket_to_chain_contact
+  component: 'Tracks: chain and linkage wear (sprocket to chain contact)'
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_sprocket
+  measurement: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: Same tier logic as sprocket teeth.
+- key: tracks_rollers_top_and_bottom
+  component: 'Tracks: rollers top and bottom'
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Lift machine on arms, roll track by hand, check for flat spots
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_roller
+  measurement: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: 'Shared: Tracks.'
+- key: tracks_idler
+  component: 'Tracks: idler'
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Physical (check for play)
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: play
+  measurement: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: Idler holds system tension. Should stay smooth with no play.
+- key: tracks_rubber_track_condition
+  component: 'Tracks: rubber track condition'
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual (cracks, tears, cording)
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_rubber
+  measurement: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: 'Shared: Tracks. Rubber tracks have no bolts or grease points.'
+- key: tracks_debris_inside_tracks
+  component: 'Tracks: debris inside tracks'
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_debris
+  measurement: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: 'Shared: Tracks.'
+- key: track_tension
+  component: Track tension
+  section: Undercarriage
+  walkthrough_group: Tires (wheeled) or Tracks (tracked)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Measure sag per operator manual
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_bolts
+  measurement:
+    unit: mm_sag
+    reference: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: Adjust per manual to prevent sprocket wear.
+- key: cab_door_glass_door_seals
+  component: Cab door / glass / door seals
+  section: Cab
+  walkthrough_group: Cab and Safety (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: Seals intact, glass clean, door latches.
+    medium: Seal cracked or pulling away, minor glass chip.
+    high: Glass cracked through, door will not latch, seal missing.
+  measurement: null
+  notes_to_tech: null
+- key: seat_belt_condition_and_function
+  component: Seat belt (condition and function)
+  section: Safety
+  walkthrough_group: Cab and Safety (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: latches, retracts, webbing intact'
+    fail: 'FAIL: frayed, cut, will not latch or retract'
+  measurement: null
+  notes_to_tech: null
+- key: rops_structure
+  component: ROPS structure
+  section: Safety
+  walkthrough_group: Cab and Safety (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: no damage, mounting bolts tight'
+    fail: 'FAIL: cracked, bent, or loose mounting bolts'
+  measurement: null
+  notes_to_tech: null
+- key: backup_alarm
+  component: Backup alarm
+  section: Safety
+  walkthrough_group: Cab and Safety (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: pass_fail
+  photo_required: false
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: sounds immediately on reverse actuation, no delay'
+    fail: 'FAIL: delayed, weak, or silent'
+  measurement: null
+  notes_to_tech: null
+- key: lights_work_and_travel
+  component: Lights (work and travel)
+  section: Safety
+  walkthrough_group: Cab and Safety (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: all lights work, lenses intact'
+    fail: 'FAIL: any light out or lens/housing damaged'
+  measurement: null
+  notes_to_tech: null
+- key: startup_diagnostic_codes
+  component: Startup diagnostic codes
+  section: Cab
+  walkthrough_group: Cab and Safety (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Read display at startup
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: No codes.
+    medium: Code displayed, logged verbatim.
+    high: Code displayed and machine derated or warning lamp active. Log verbatim.
+  measurement:
+    unit: code_count
+    reference: 0
+  notes_to_tech: Log only. Uptime does not diagnose electronics.
+- key: gauges_function_and_readings
+  component: Gauges (function and readings)
+  section: Cab
+  walkthrough_group: Cab and Safety (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Read at idle
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: all gauges function and read normal'
+    fail: 'FAIL: any gauge dead or reading abnormal'
+  measurement: null
+  notes_to_tech: null
+- key: engine_oil_level
+  component: Engine oil level
+  section: Fluids
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: fluid_level
+  check_method_label: Dipstick
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: engine_oil_change
+  component: Engine oil change
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly / 100 Hr
+  check_method: visual
+  check_method_label: Change per mfr spec
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: Change every 100 to 250 hr or per manufacturer. Log date and hour meter.
+- key: coolant_level
+  component: Coolant level
+  section: Fluids
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Visual at overflow bottle
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level. Check mixing ratio monthly.'
+- key: main_drive_belt
+  component: Main / drive belt
+  section: Belts
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: VISUAL ONLY on skid steer (compartment too tight for tug test)
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: belt
+  measurement: null
+  notes_to_tech: 'Shared: Belts.'
+- key: pto_belt
+  component: PTO belt
+  section: Belts
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual only
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: belt
+  measurement: null
+  notes_to_tech: 'Shared: Belts. The belt is the wear item, not the PTO unit.'
+- key: ac_compressor_belt
+  component: AC compressor belt
+  section: Belts
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual only
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: belt
+  measurement: null
+  notes_to_tech: 'Shared: Belts.'
+- key: fuel_filter_glass_bowl_check
+  component: 'Fuel filter: glass bowl check'
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual, drain sediment if present
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: Bowl clear.
+    medium: Sediment or water visible, drained.
+    high: Heavy contamination or bowl cracked/leaking.
+  measurement: null
+  notes_to_tech: null
+- key: fuel_filter_replacement
+  component: Fuel filter replacement
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Replace
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters. Write change date on the filter body.'
+- key: air_filter_dust_valve
+  component: 'Air filter: dust valve'
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Squeeze dust/debris valve to eject debris
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: Little debris ejected.
+    medium: Heavy debris ejected, element visibly dusty.
+    high: Restriction indicator tripped or element damaged.
+  measurement: null
+  notes_to_tech: null
+- key: air_filter_replacement
+  component: Air filter replacement
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Replace
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: hydraulic_filter
+  component: Hydraulic filter
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Replace
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: oil_filter
+  component: Oil filter
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly / 100 Hr
+  check_method: visual
+  check_method_label: Replace with oil change
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: cabin_cab_air_filter
+  component: Cabin / cab air filter
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Clear or replace
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: radiator
+  component: Radiator
+  section: Cooling
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Remove cover, inspect, clear debris
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fins
+  measurement: null
+  notes_to_tech: 'Shared: Fins.'
+- key: cooling_fan
+  component: Cooling fan
+  section: Cooling
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: Blades intact, no play.
+    medium: Minor blade chip or debris buildup.
+    high: Cracked or missing blade, or oil leak at hub.
+  measurement: null
+  notes_to_tech: null
+- key: battery_terminals_mount_voltmeter_reading
+  component: Battery (terminals, mount, voltmeter reading)
+  section: Electrical
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Visual + voltmeter / battery tester
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: battery
+  measurement:
+    unit: volts
+    reference: 12.6
+    reference_24v: 25.2
+    flow: battery
+  notes_to_tech: >-
+    Shared: Battery. Reference 12.6 V (12 V system) or 25.2 V (24 V system). Check electrolyte on non
+    sealed batteries.
+- key: electrical_connections_and_harness
+  component: Electrical connections and harness
+  section: Electrical
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: elec
+  measurement: null
+  notes_to_tech: 'Shared: Electrical connections.'
+- key: engine_compartment_main_components_alternator_starter_water
+  component: >-
+    Engine compartment main components (alternator, starter, water pump, turbo, wiring)
+  section: Engine
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual (cracks, corrosion, leaks, loose mounting)
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: frame
+  measurement: null
+  notes_to_tech: Visual only. No invasive tools.
+- key: exhaust_system
+  component: Exhaust system
+  section: Engine
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: No leaks, hangers intact.
+    medium: Minor soot trace at a joint or loose clamp.
+    high: Exhaust leak, cracked manifold, or missing hardware.
+  measurement: null
+  notes_to_tech: null
+- key: exhaust_carbon_clear_tier_3_or_older_only
+  component: Exhaust carbon clear (Tier 3 or older only)
+  section: Engine
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: function
+  check_method_label: Run machine to clear carbon; check small valve under exhaust manifold if present
+  result_type: pass_fail
+  photo_required: false
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: machine run, valve clear'
+    fail: 'FAIL: valve stuck or heavy carbon'
+  measurement: null
+  applies_when:
+    emissions_tier: tier_3
+  notes_to_tech: 'Conditional: Tier 4 machines with DEF/SCR skip this step.'
+- key: cab_tilt_up_inspection_hydraulic_leaks_under_cab
+  component: Cab tilt up inspection (hydraulic leaks under cab)
+  section: Hydraulics
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: 3000 Hr
+  check_method: visual
+  check_method_label: Tilt cab, visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: leak
+  measurement: null
+  notes_to_tech: Major interval only.

@@ -1,0 +1,28 @@
+source "https://rubygems.org"
+
+gem "rails", "~> 8.1.3", ">= 8.1.3.1"
+gem "pg", "~> 1.1"
+gem "puma", ">= 5.0"
+gem "bootsnap", require: false
+gem "tzinfo-data", platforms: %i[ windows jruby ]
+
+# Auth + authorization
+gem "bcrypt", "~> 3.1.7"
+gem "pundit", "~> 2.3"
+
+# Object storage (photos, signatures, reports)
+gem "aws-sdk-s3", "~> 1.150", require: false
+
+# PDF report generation
+gem "prawn", "~> 2.5"
+gem "prawn-table", "~> 0.2"
+
+gem "rack-cors"
+
+# json 3.x changed JSON.parse arity; ActiveSupport 8.1 still calls the 2.x form.
+gem "json", "~> 2.10"
+
+group :development, :test do
+  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  gem "bundler-audit", require: false
+end

@@ -1,0 +1,767 @@
+# GENERATED from the PM checklist workbook by docs/checklists/xlsx_to_yaml.py.
+# Edit the workbook (or this file deliberately), then re-seed. Published templates are immutable:
+# a content change must ship as a new `version`.
+machine_class: excavator
+drive_type: null
+has_def: null
+version: alpha-2
+source: uptime_pm_checklists_alpha1.xlsx / tab 'Excavator'
+items:
+- key: bucket_and_get_teeth_adapters_side_cutters
+  component: Bucket and GET (teeth, adapters, side cutters)
+  section: Attachment
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: get
+  measurement: null
+  notes_to_tech: 'Shared: GET.'
+- key: bucket_cylinder_and_linkage
+  component: Bucket cylinder and linkage
+  section: Hydraulics
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual + grease
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: cyl
+  measurement: null
+  notes_to_tech: 'Shared: Hydraulic cylinder. Linkage pins use shared pins tiers.'
+- key: stick_cylinder
+  component: Stick cylinder
+  section: Hydraulics
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual + grease
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: cyl
+  measurement: null
+  notes_to_tech: 'Shared: Hydraulic cylinder.'
+- key: boom_cylinders
+  component: Boom cylinders
+  section: Hydraulics
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual + grease
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: cyl
+  measurement: null
+  notes_to_tech: 'Shared: Hydraulic cylinder.'
+- key: hydraulic_hoses_boom_stick_bucket_swing_travel
+  component: Hydraulic hoses (boom, stick, bucket, swing, travel)
+  section: Hydraulics
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual, full length
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: hose
+  measurement: null
+  notes_to_tech: 'Shared: Hoses.'
+- key: hydraulic_quick_coupler_if_equipped
+  component: Hydraulic quick coupler (if equipped)
+  section: Attachment
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: locks fully, pins seat, indicator confirms lock'
+    fail: 'FAIL: will not lock or indicator not confirming'
+  measurement: null
+  notes_to_tech: Added from cross reference.
+- key: centralized_arm_greasing_point_if_equipped
+  component: Centralized arm greasing point (if equipped)
+  section: Lubrication
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Grease, confirm each point takes grease
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: present and every point takes grease'
+    fail: 'FAIL: blocked point or grease not reaching a pin'
+  measurement: null
+  notes_to_tech: Volvo style design. Check present and working, not just level.
+- key: boom_stick_bucket_pins_and_bushings
+  component: Boom / stick / bucket pins and bushings
+  section: Lubrication
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual + grease
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: pins
+  measurement: null
+  notes_to_tech: 'Shared: Pins and bushings.'
+- key: underneath_machine_final_drive_leaks
+  component: 'Underneath machine: final drive leaks'
+  section: Powertrain
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: leak
+  measurement: null
+  notes_to_tech: 'Shared: Leak.'
+- key: underneath_machine_swing_drive_leaks
+  component: 'Underneath machine: swing drive leaks'
+  section: Powertrain
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: leak
+  measurement: null
+  notes_to_tech: 'Shared: Leak.'
+- key: carbody
+  component: Carbody
+  section: Structure
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: frame
+  measurement: null
+  notes_to_tech: 'Shared: Frame.'
+- key: undercarriage_track_tension
+  component: 'Undercarriage: track tension'
+  section: Undercarriage
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Measure sag per manual
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_bolts
+  measurement:
+    unit: mm_sag
+    reference: null
+  applies_when:
+    drive_type: tracked
+  notes_to_tech: 'Volvo guidance: 40 hr interval. Shared: Tracks.'
+- key: undercarriage_shoe_bolts_chain
+  component: 'Undercarriage: shoe bolts / chain'
+  section: Undercarriage
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Visual + physical
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_bolts
+  measurement: null
+  notes_to_tech: 'Shared: Tracks.'
+- key: undercarriage_sprocket_teeth
+  component: 'Undercarriage: sprocket teeth'
+  section: Undercarriage
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_sprocket
+  measurement: null
+  notes_to_tech: 'Shared: Tracks.'
+- key: undercarriage_rollers_and_idlers
+  component: 'Undercarriage: rollers and idlers'
+  section: Undercarriage
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Visual + play check
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_roller
+  measurement: null
+  notes_to_tech: 'Shared: Tracks. Idler should have no play.'
+- key: undercarriage_debris_packing
+  component: 'Undercarriage: debris packing'
+  section: Undercarriage
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: trk_debris
+  measurement: null
+  notes_to_tech: 'Shared: Tracks.'
+- key: steps_and_handholds
+  component: Steps and handholds
+  section: Access
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: intact and clean'
+    fail: 'FAIL: bent, loose, or missing'
+  measurement: null
+  notes_to_tech: null
+- key: batteries_and_hold_downs_voltmeter
+  component: Batteries and hold downs (voltmeter)
+  section: Electrical
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Visual + voltmeter
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: battery
+  measurement:
+    unit: volts
+    reference: 12.6
+    reference_24v: 25.2
+    flow: battery
+  notes_to_tech: 'Shared: Battery.'
+- key: electrical_connections_and_harness
+  component: Electrical connections and harness
+  section: Electrical
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: elec
+  measurement: null
+  notes_to_tech: 'Shared: Electrical connections.'
+- key: windshield_wipers_and_washers
+  component: Windshield wipers and washers
+  section: Cab
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: work, fluid present'
+    fail: 'FAIL: not working'
+  measurement: null
+  notes_to_tech: null
+- key: fire_extinguisher
+  component: Fire extinguisher
+  section: Safety
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: charged, in date'
+    fail: 'FAIL: discharged or missing'
+  measurement: null
+  notes_to_tech: null
+- key: engine_coolant_level
+  component: Engine coolant level
+  section: Fluids
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Visual
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: primary_secondary_fuel_filters_water_separator
+  component: Primary / secondary fuel filters, water separator
+  section: Consumables
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly (drain) / Monthly (replace)
+  check_method: visual
+  check_method_label: Drain, replace on interval
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: air_filter_restriction_indicator
+  component: Air filter (restriction indicator)
+  section: Consumables
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Read indicator
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: hydraulic_oil_tank_level_damage_leaks
+  component: Hydraulic oil tank (level, damage, leaks)
+  section: Fluids
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: fluid_level
+  check_method_label: Sight glass + visual
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: hydraulic_oil_filters_leaks
+  component: Hydraulic oil filters (leaks)
+  section: Consumables
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly (visual) / Monthly (replace)
+  check_method: visual
+  check_method_label: Visual + replace
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: radiator_fin_blockage_leaks
+  component: Radiator (fin blockage, leaks)
+  section: Cooling
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fins
+  measurement: null
+  notes_to_tech: 'Shared: Fins.'
+- key: hydraulic_oil_cooler_fin_blockage_leaks
+  component: Hydraulic oil cooler (fin blockage, leaks)
+  section: Cooling
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fins
+  measurement: null
+  notes_to_tech: 'Shared: Fins.'
+- key: ac_condenser_fin_blockage_leaks
+  component: AC condenser (fin blockage, leaks)
+  section: Cooling
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fins
+  measurement: null
+  notes_to_tech: 'Shared: Fins.'
+- key: lights
+  component: Lights
+  section: Safety
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: all work'
+    fail: 'FAIL: any out or damaged'
+  measurement: null
+  notes_to_tech: null
+- key: mirrors
+  component: Mirrors
+  section: Cab
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: intact, adjusted, clean'
+    fail: 'FAIL: cracked or missing'
+  measurement: null
+  notes_to_tech: null
+- key: engine_oil_filter_leaks
+  component: Engine oil filter (leaks)
+  section: Consumables
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly (visual) / Monthly (replace)
+  check_method: visual
+  check_method_label: Visual + replace
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: overall_machine_loose_or_missing_nuts_and_bolts_loose_guards
+  component: Overall machine (loose or missing nuts and bolts, loose guards)
+  section: Structure
+  walkthrough_group: From the Ground
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: All present and tight.
+    medium: Loose fastener or guard found and tightened.
+    high: Missing or broken hardware or guard.
+  measurement: null
+  notes_to_tech: null
+- key: engine_oil_level
+  component: Engine oil level
+  section: Fluids
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: fluid_level
+  check_method_label: Dipstick
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: engine_oil_change
+  component: Engine oil change
+  section: Consumables
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: monthly
+  cadence_label: Monthly / 100 Hr
+  check_method: visual
+  check_method_label: Change
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: Log date and hour meter.
+- key: swing_gear_oil
+  component: Swing gear oil
+  section: Fluids
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: fluid_level
+  check_method_label: Level check + visual for leaks
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: fuel_tank_level_damage_leaks
+  component: Fuel tank (level, damage, leaks)
+  section: Fluids
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: leak
+  measurement: null
+  notes_to_tech: 'Shared: Leak.'
+- key: def_tank_if_equipped
+  component: DEF tank (if equipped)
+  section: Fluids
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: fluid_level
+  check_method_label: Visual level + debris
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: Level adequate, no debris.
+    medium: Level low or minor debris.
+    high: Critically low or contamination risking SCR.
+  measurement:
+    unit: percent
+    reference: null
+  applies_when:
+    has_def: true
+  notes_to_tech: Uptime does NOT service DEF. Flag only.
+- key: all_hoses_engine
+  component: All hoses (engine)
+  section: Engine
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: hose
+  measurement: null
+  notes_to_tech: 'Shared: Hoses.'
+- key: all_belts
+  component: All belts
+  section: Belts
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: 'PHYSICAL: tug / deflection'
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: belt
+  measurement: null
+  notes_to_tech: 'Shared: Belts.'
+- key: engine_compartment_main_components_alternator_starter_water
+  component: >-
+    Engine compartment main components (alternator, starter, water pump, turbo, wiring)
+  section: Engine
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: frame
+  measurement: null
+  notes_to_tech: Visual only.
+- key: overall_engine_compartment_trash_dirt_leaks
+  component: Overall engine compartment (trash, dirt, leaks)
+  section: Engine
+  walkthrough_group: Engine Compartment / Platforms
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual + clean
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: leak
+  measurement: null
+  notes_to_tech: 'Shared: Leak.'
+- key: seat_and_seat_belt_incl_install_by_date
+  component: Seat and seat belt (incl. install by date)
+  section: Safety
+  walkthrough_group: Inside the Cab
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function + read date
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: belt latches and retracts, within install by date'
+    fail: 'FAIL: frayed, will not latch, or past install by date'
+  measurement: null
+  notes_to_tech: null
+- key: horn_travel_alarm_warning_devices
+  component: Horn, travel alarm, warning devices
+  section: Safety
+  walkthrough_group: Inside the Cab
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function
+  result_type: pass_fail
+  photo_required: false
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: all work, alarm immediate'
+    fail: 'FAIL: any silent or delayed'
+  measurement: null
+  notes_to_tech: null
+- key: indicators_monitor_panel_switches
+  component: Indicators, monitor panel, switches
+  section: Cab
+  walkthrough_group: Inside the Cab
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: all function'
+    fail: 'FAIL: any dead or abnormal'
+  measurement: null
+  notes_to_tech: null
+- key: travel_controls
+  component: Travel controls
+  section: Cab
+  walkthrough_group: Inside the Cab
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function
+  result_type: pass_fail
+  photo_required: false
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: correct operation, return to neutral'
+    fail: 'FAIL: sticking or wrong response'
+  measurement: null
+  notes_to_tech: null
+- key: rops
+  component: ROPS
+  section: Safety
+  walkthrough_group: Inside the Cab
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: no damage, bolts tight'
+    fail: 'FAIL: damage or loose bolts'
+  measurement: null
+  notes_to_tech: null
+- key: heating_and_cooling_system
+  component: Heating and cooling system
+  section: Cab
+  walkthrough_group: Inside the Cab
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: function
+  check_method_label: Function
+  result_type: pass_fail
+  photo_required: false
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: functions'
+    fail: 'FAIL: does not function'
+  measurement: null
+  notes_to_tech: null
+- key: cab_air_filter
+  component: Cab air filter
+  section: Consumables
+  walkthrough_group: Inside the Cab
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Clear or replace
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: startup_diagnostic_codes
+  component: Startup diagnostic codes
+  section: Cab
+  walkthrough_group: Inside the Cab
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Read at startup
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: No codes.
+    medium: Code displayed, logged verbatim.
+    high: Code with derate or warning lamp. Logged verbatim.
+  measurement:
+    unit: code_count
+    reference: 0
+  notes_to_tech: Log only.
