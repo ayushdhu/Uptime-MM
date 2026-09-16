@@ -4,7 +4,7 @@
 machine_class: farm_tractor
 drive_type: null
 has_def: null
-version: alpha-1
+version: alpha-2
 source: uptime_pm_checklists_alpha1.xlsx / tab 'Farm Tractor'
 items:
 - key: rear_pto_engage_disengage_shields_and_guards
@@ -48,7 +48,7 @@ items:
   check_method: function
   check_method_label: Function test
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: PTO behaves per manual on and off seat'
@@ -64,7 +64,7 @@ items:
   check_method: function
   check_method_label: Function test
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: engine will not crank in gear'
@@ -80,7 +80,7 @@ items:
   check_method: function
   check_method_label: Function test
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: engine will not crank with PTO engaged'
@@ -96,7 +96,7 @@ items:
   check_method: function
   check_method_label: Function test
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: engine stops / PTO stops when operator leaves seat as designed'
@@ -112,7 +112,7 @@ items:
   check_method: function
   check_method_label: Function test
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: firm, even, park brake holds'
@@ -353,7 +353,7 @@ items:
   check_method: function
   check_method_label: Function test
   result_type: tiered
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   tier_criteria:
     low: Smooth engagement, no slipping.

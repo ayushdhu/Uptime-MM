@@ -117,18 +117,25 @@ export function roundUp(a: Severity | null, b: Severity | null): Severity | null
   return rank[a] >= rank[b] ? a : b;
 }
 
-export function photoRequired(item: Pick<TemplateItem, 'result_type' | 'photo_required'>): boolean {
-  // Every tiered or pass_fail item needs a photo before it can be marked done. Measurement
-  // items follow the template flag (always true in alpha-1).
-  return item.result_type !== 'measurement' || item.photo_required;
+/**
+ * Photo required per template item (`photo_required`), not universally (ADR-0010):
+ * false only for function tests whose finding is behavioural or audible. A
+ * carried-forward recheck always needs a fresh photo (spec 6). Unknown template
+ * item: require one.
+ */
+export function photoRequired(template: Pick<TemplateItem, 'photo_required'> | undefined, item?: Pick<InspectionItem, 'carried_forward_from_item_id'>): boolean {
+  if (item?.carried_forward_from_item_id) {
+    return true;
+  }
+  return template ? template.photo_required !== false : true;
 }
 
-/** Whether an item can be marked done. Photo first, then a result, or an explicit skip reason. */
+/** Whether an item can be marked done. Photo first (where required), then a result, or an explicit skip reason. */
 export function itemCompletionError(item: InspectionItem, template: TemplateItem | undefined, photoCount: number): string | null {
   if (item.skipped) {
     return item.skip_reason && item.skip_reason.trim().length > 0 ? null : 'A typed reason is required to skip an item.';
   }
-  const needsPhoto = template ? photoRequired(template) : true;
+  const needsPhoto = photoRequired(template, item);
   if (needsPhoto && photoCount === 0) {
     return 'Take at least one photo before grading this item.';
   }

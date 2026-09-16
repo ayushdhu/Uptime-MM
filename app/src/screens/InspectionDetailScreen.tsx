@@ -6,6 +6,7 @@ import {Button, Card, Input, Label, Muted, Screen, Title, colors} from '../compo
 import {highSeverityEvents as eventsRepo, inspections as inspectionsRepo, items as itemsRepo, notes as notesRepo} from '../db/repositories';
 import type {HighSeverityEvent, Inspection, InspectionItem, InspectionNote} from '../domain/types';
 import {appendNote} from '../services/inspectionFlow';
+import {inspectionSyncState, type InspectionSyncState} from '../services/syncStatus';
 import {useApp} from '../state/AppContext';
 import type {RootStackParamList} from '../navigation/types';
 
@@ -20,9 +21,11 @@ export function InspectionDetailScreen() {
   const [events, setEvents] = useState<HighSeverityEvent[]>([]);
   const [body, setBody] = useState('');
   const [resolveNote, setResolveNote] = useState('');
+  const [syncState, setSyncState] = useState<InspectionSyncState | null>(null);
 
   const load = useCallback(() => {
     setInspection(inspectionsRepo.find(params.inspectionId));
+    setSyncState(inspectionSyncState(params.inspectionId));
     setItems(itemsRepo.forInspection(params.inspectionId));
     setNotes(notesRepo.forInspection(params.inspectionId));
     setEvents(eventsRepo.forInspection(params.inspectionId));
@@ -78,6 +81,17 @@ export function InspectionDetailScreen() {
           {inspection.locked_at ? ` · locked ${inspection.locked_at.slice(0, 16).replace('T', ' ')}` : ''} · {inspection.synced_at ? 'synced' : 'not synced'}
         </Muted>
         {inspection.status === 'locked' ? <Text style={styles.locked}>Locked. Results cannot be edited. Add a note below.</Text> : null}
+        {syncState && inspection.status === 'locked' && !syncState.lockedOnServer ? (
+          <Card style={styles.notRecorded}>
+            <Text style={styles.notRecordedTitle}>NOT yet recorded on the server</Text>
+            {syncState.outstanding.map(o => (
+              <Text key={o} style={styles.item}>• {o}</Text>
+            ))}
+            {syncState.errors.length > 0 ? <Text style={styles.errText}>Last error: {syncState.errors[syncState.errors.length - 1].last_error}</Text> : null}
+            <Button title={sync.running ? 'Syncing…' : 'Sync now'} kind="secondary" onPress={() => syncNow().then(load)} loading={sync.running} />
+          </Card>
+        ) : null}
+        {syncState?.lockedOnServer ? <Text style={styles.recorded}>Recorded on the server; PDF report generated.</Text> : null}
         <Button title="View report" kind="secondary" onPress={() => nav.navigate('Report', {inspectionId: inspection.client_generated_id})} />
 
         <Label>Items</Label>
@@ -139,6 +153,10 @@ export function InspectionDetailScreen() {
 
 const styles = StyleSheet.create({
   locked: {color: colors.high, fontWeight: '700', marginVertical: 8},
+  recorded: {color: colors.low, fontWeight: '700', marginVertical: 8},
+  notRecorded: {borderColor: colors.high, borderWidth: 2},
+  notRecordedTitle: {color: colors.high, fontWeight: '800', fontSize: 16, marginBottom: 4},
+  errText: {color: colors.high, marginTop: 4},
   row: {flexDirection: 'row', justifyContent: 'space-between', gap: 10},
   item: {fontSize: 15, color: colors.text, flex: 1},
   result: {fontWeight: '800'},

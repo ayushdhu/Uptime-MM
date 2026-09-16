@@ -125,7 +125,7 @@ export function CheckoutScreen() {
             <Label>Statement, in their own words</Label>
             <Input value={statement} onChangeText={setStatement} multiline style={{minHeight: 70}} />
             {hasCheckout ? <Muted>Already signed.</Muted> : <SignaturePad onCaptured={sign} />}
-            <Muted>Signing locks the inspection permanently. Anything added later is a note.</Muted>
+            <Muted>Signing locks the inspection on this tablet. It is recorded once the server confirms the lock; the report screen shows that status.</Muted>
             {busy ? <Muted>Locking…</Muted> : null}
           </Card>
         )}

@@ -141,9 +141,14 @@ export interface HighFlowInput {
 
 /** Signing creates the high_severity_events row (spec 6). */
 export function recordHighSeverityEvent(input: HighFlowInput): HighSeverityEvent {
-  const missing = (Object.keys(input.checklist) as Array<keyof ConversationChecklist>).filter(k => !input.checklist[k]);
+  const steps: Array<keyof ConversationChecklist> = ['item_identified_and_shown', 'photo_shown', 'recommendation_stated', 'decision_recorded'];
+  const missing = steps.filter(k => !input.checklist[k]);
   if (missing.length) {
     throw new Error(`Complete every conversation step: ${missing.join(', ')}`);
+  }
+  const initials = (input.checklist.owner_initials ?? '').trim();
+  if (initials.length < 1 || initials.length > 6) {
+    throw new Error('The owner must initial the acknowledgment (1 to 6 characters).');
   }
   if (!input.outOfService && (!input.recheckIntervalDays || input.recheckIntervalDays <= 0)) {
     throw new Error('Agree a recheck interval in days when the machine stays in service.');
@@ -164,7 +169,7 @@ export function recordHighSeverityEvent(input: HighFlowInput): HighSeverityEvent
     component_name: input.item.component_name,
     template_item_key: input.item.template_item_key,
     opened_at: new Date().toISOString(),
-    conversation_checklist: input.checklist,
+    conversation_checklist: {...input.checklist, owner_initials: initials},
     machine_out_of_service: input.outOfService,
     recheck_interval_days: input.outOfService ? null : input.recheckIntervalDays,
     repair_plan: input.outOfService ? input.repairPlan?.trim() || null : input.repairPlan!.trim(),

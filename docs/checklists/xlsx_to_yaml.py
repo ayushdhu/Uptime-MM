@@ -12,6 +12,10 @@ Rules:
   * A row whose Low/Medium/High text matches a shared criteria row byte for
     byte is written as `criteria_ref: <key>` with no inline text, so the
     shared file is the single source of truth and the texts can never drift.
+  * The "Photo Required" column (Yes/No) becomes `photo_required`. Missing or
+    blank means Yes. No is reserved for function tests whose finding is
+    behavioural or audible rather than visual (ADR-0010).
+  * The template version is read from the "Template version: ..." line on each tab.
   * Item keys are slugs of the component label, de-duplicated per template.
     Once a YAML file is committed, keys are stable; re-running this script
     must not be used to silently rename keys of a published template
@@ -113,17 +117,24 @@ def convert_tab(wb, tab, machine_class, shared):
     items = []
     seen = {}
     section = None
-    header_seen = False
+    header = None
+    version = "alpha-1"
     for row in ws.iter_rows(values_only=True):
         cells = ["" if c is None else str(c) for c in row]
         if not any(cells):
             continue
+        m = re.search(r"Template version:\s*([A-Za-z0-9.-]+)", cells[0])
+        if m and header is None:
+            version = m.group(1)
+            continue
         if cells[0] == "Component" and cells[1] == "Section":
-            header_seen = True
+            header = {norm(h): i for i, h in enumerate(cells) if h}
             continue
-        if not header_seen:
+        if header is None:
             continue
-        component, sect, cad, method, rtype, low, med, high, default, notes = (cells + [""] * 10)[:10]
+        component, sect, cad, method, rtype, low, med, high, default, notes = (cells + [""] * 11)[:10]
+        photo_col = header.get("Photo Required")
+        photo_cell = norm(cells[photo_col]) if photo_col is not None and photo_col < len(cells) else ""
         if component and not sect and not rtype:
             section = norm(component)  # section header row
             continue
@@ -145,7 +156,7 @@ def convert_tab(wb, tab, machine_class, shared):
             "check_method": check_method_of(method, rtype),
             "check_method_label": norm(method),
             "result_type": rtype,
-            "photo_required": True,
+            "photo_required": photo_cell.lower() != "no",
             "default_if_ambiguous": "round_up",
         }
         ref = match_shared(shared, low, med, high)
@@ -165,7 +176,7 @@ def convert_tab(wb, tab, machine_class, shared):
         "machine_class": machine_class,
         "drive_type": None,
         "has_def": None,
-        "version": "alpha-1",
+        "version": version,
         "source": f"uptime_pm_checklists_alpha1.xlsx / tab '{tab}'",
         "items": items,
     }

@@ -103,6 +103,9 @@ export interface Inspection {
   status: InspectionStatus;
   locked_at: string | null;
   device_id: string;
+  /** Set only when the server has accepted the lock (device-side bookkeeping). */
+  server_locked_at?: string | null;
+  server_report_sha256?: string | null;
 }
 
 export interface MeasurementDetail {
@@ -167,6 +170,8 @@ export interface ConversationChecklist {
   photo_shown: boolean;
   recommendation_stated: boolean;
   decision_recorded: boolean;
+  /** Typed by the owner (ADR-0011). Required. */
+  owner_initials?: string;
 }
 
 export interface HighSeverityEvent {
@@ -216,6 +221,7 @@ export interface SyncQueueRow {
   inspection_id: string;
   attempts: number;
   last_error: string | null;
+  last_attempt_at?: string | null;
   status: 'pending' | 'done' | 'failed';
   created_at: string;
 }

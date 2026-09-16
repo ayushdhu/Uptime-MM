@@ -95,11 +95,15 @@ export class SyncEngine {
         report.pushed++;
       } catch (e) {
         const err = e as Error;
-        const giveUp = row.attempts + 1 >= MAX_ATTEMPTS || (err instanceof ApiError && err.status === 422);
-        syncQueue.markError(row.id, err.message, giveUp);
+        // Every failure is retried with backoff up to MAX_ATTEMPTS, including a 422 on
+        // confirm (re-upload) or lock (the outstanding list may clear once photos land).
+        // Nothing is ever dropped silently: the reason is persisted on the row.
+        const giveUp = row.attempts + 1 >= MAX_ATTEMPTS;
+        const message = describeFailure(row, err);
+        syncQueue.markError(row.id, message, giveUp);
         report.failed++;
-        report.errors.push(`${row.entity_type} ${row.entity_id}: ${err.message}`);
-        this.log(`sync ${row.entity_type} ${row.entity_id} failed: ${err.message}`);
+        report.errors.push(message);
+        this.log(`sync ${row.entity_type} ${row.entity_id} failed: ${message}`);
         if (err instanceof ApiError && err.isUnauthorized) {
           throw err;
         }
@@ -178,6 +182,10 @@ export class SyncEngine {
       content_type: 'image/jpeg',
     });
     const bytes = await this.fs.readFile(photo.local_path);
+    const size = bytes instanceof ArrayBuffer ? bytes.byteLength : bytes.size;
+    if (size !== photo.byte_size) {
+      throw new Error(`local file is ${size} bytes but ${photo.byte_size} were hashed at capture; refusing to upload a corrupt photo`);
+    }
     await this.api.putPresigned(presigned.upload_url, bytes, presigned.content_type);
     const confirmed = await this.api.confirmPhoto({
       s3_key: presigned.s3_key,
@@ -239,12 +247,16 @@ export class SyncEngine {
     const serverId = this.serverInspectionId(inspectionId);
     try {
       const res = await this.api.lock(serverId, insp.locked_at ?? new Date().toISOString());
-      inspectionsRepo.markSynced(inspectionId, res.data.synced_at ?? res.server_time);
+      inspectionsRepo.markServerLocked(inspectionId, res.data.locked_at ?? res.server_time, res.data.report?.sha256 ?? null);
     } catch (e) {
       // Already locked on the server (a retry after a dropped response): that is success.
       if (e instanceof ApiError && e.isLocked) {
-        inspectionsRepo.markSynced(inspectionId, new Date().toISOString());
+        inspectionsRepo.markServerLocked(inspectionId, new Date().toISOString(), null);
         return;
+      }
+      if (e instanceof ApiError && e.code === 'not_lockable') {
+        const details = Array.isArray(e.details) ? e.details.join('; ') : e.message;
+        throw new Error(`server refused to lock: ${details}`);
       }
       throw e;
     }
@@ -259,6 +271,29 @@ export class SyncEngine {
     await this.api.createNote(serverId, note);
     notesRepo.markSynced(id, new Date().toISOString());
   }
+}
+
+/** Human readable, with what the row is (component name for photos) so the technician can act on it. */
+export function describeFailure(row: SyncQueueRow, err: Error): string {
+  let what: string = row.entity_type.replace('_', ' ');
+  if (row.entity_type === 'photo') {
+    const photo = photosRepo.find(row.entity_id);
+    const item = photo && itemsRepo.find(photo.inspection_item_id);
+    what = `photo of ${item?.component_name ?? 'an item'}`;
+  } else if (row.entity_type === 'signature') {
+    const sig = signaturesRepo.find(row.entity_id);
+    what = `${sig?.signature_type === 'high_severity_ack' ? 'High acknowledgment' : 'checkout'} signature`;
+  } else if (row.entity_type === 'high_severity_event') {
+    what = `High severity event (${eventsRepo.find(row.entity_id)?.component_name ?? 'item'})`;
+  } else if (row.entity_type === 'lock') {
+    what = 'inspection lock';
+  }
+  return `${what}: ${err.message}`;
+}
+
+/** Backoff between automatic retries: 30 s, 1 min, 2 min, 4 min, then every 5 min. */
+export function nextRetryDelayMs(consecutiveFailedRuns: number): number {
+  return Math.min(30_000 * 2 ** Math.max(0, consecutiveFailedRuns - 1), 300_000);
 }
 
 export function toLocalEvent(e: ServerHighSeverityEvent): HighSeverityEvent {

@@ -138,7 +138,8 @@ class ReportGenerator
         doc.text "- #{ev.inspection_item.component_name}: #{decision}", size: 9
       end
       doc.move_down 2
-      doc.text "Acknowledged by #{sig.signer_name} (#{sig.signer_role}) at #{fmt(sig.signed_at)}", size: 9
+      initials = evs.map(&:owner_initials).reject(&:blank?).uniq.join(", ")
+      doc.text "Acknowledged by #{sig.signer_name} (#{sig.signer_role}) at #{fmt(sig.signed_at)}#{initials.present? ? ", initialled #{initials}" : ''}", size: 9
       doc.text "Owner statement: \"#{sig.signer_statement}\"", size: 9, style: :italic if sig.signer_statement.present?
       draw_signature_image(doc, sig)
     end

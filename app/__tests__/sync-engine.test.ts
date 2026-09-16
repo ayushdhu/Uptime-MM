@@ -228,7 +228,7 @@ test('full offline walkthrough with a High finding syncs parent-before-child, ve
   files.set('/sig/ack.png', 'ack-png');
   signatures.insert({client_generated_id: 'sig-ack', server_id: null, inspection_id: inspection.client_generated_id, signature_type: 'high_severity_ack', signer_name: 'Olly', signer_role: 'owner', signer_statement: 'park it', local_path: '/sig/ack.png', image_s3_key: null, sha256: sha256Hex('ack-png'), signed_at: 'now', device_id: 'ipad', uploaded_at: null});
   syncQueue.enqueue('signature', 'sig-ack', inspection.client_generated_id);
-  recordHighSeverityEvent({inspection, item: hose, checklist: {item_identified_and_shown: true, photo_shown: true, recommendation_stated: true, decision_recorded: true}, outOfService: true, recheckIntervalDays: null, repairPlan: null, ownerSignatureId: 'sig-ack'});
+  recordHighSeverityEvent({inspection, item: hose, checklist: {item_identified_and_shown: true, photo_shown: true, recommendation_stated: true, decision_recorded: true, owner_initials: 'OO'}, outOfService: true, recheckIntervalDays: null, repairPlan: null, ownerSignatureId: 'sig-ack'});
 
   // Checkout signature and lock, all still offline
   signatures.insert({client_generated_id: 'sig-out', server_id: null, inspection_id: inspection.client_generated_id, signature_type: 'visit_checkout', signer_name: 'Olly', signer_role: 'owner', signer_statement: 'ok', local_path: null, image_s3_key: null, sha256: null, signed_at: 'now', device_id: 'ipad', uploaded_at: null});
@@ -289,7 +289,11 @@ test('a photo whose bytes changed after hashing is rejected and kept on device; 
   expect(report.errors[0]).toMatch(/hash mismatch/);
   expect(photos.find(p.client_generated_id)!.local_path).toBe(p.local_path);
   expect(files.has(p.local_path!)).toBe(true);
-  expect(syncQueue.failed().map(r => r.entity_type)).toEqual(['photo']);
+  // Retried with backoff rather than dropped: pending, with the server's reason recorded.
+  const row = syncQueue.unfinished().find(r => r.entity_type === 'photo')!;
+  expect(row.status).toBe('pending');
+  expect(row.attempts).toBe(1);
+  expect(row.last_error).toMatch(/hash_mismatch/);
 });
 
 test('a lock retry after the server already locked counts as success', async () => {

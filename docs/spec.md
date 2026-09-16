@@ -161,7 +161,7 @@ Rules:
 Rules:
 
 * Postgres stores metadata only. Image bytes live in S3.
-* Every inspection_item with result_type tiered or pass_fail requires at least one photo before the item can be marked done. No exceptions, no severity based skipping.
+* Every inspection_item requires at least one photo before it can be marked done, except items whose template entry sets `photo_required: false`. That flag is reserved for function tests whose finding is behavioural or audible rather than visual (backup alarm, neutral start switch, PTO interlocks, seat switch, travel controls, heating/cooling): a photo of a speaker grille or a switch proves nothing, so the evidence for those items is the technician's pass/fail plus its timestamp. The flag lives in the checklist workbook (Photo Required column) and is never derived from `check_method`. A carried-forward High recheck always needs a fresh photo. Never skipped on severity grounds. (Narrowed from "every item" after pilot run 1; see ADR-0010.)
 * The server recomputes SHA 256 on receipt and rejects the upload if it does not match the client supplied hash.
 
 **inspection_notes** (append only)

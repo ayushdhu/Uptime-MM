@@ -149,6 +149,10 @@ export const inspections = {
   markSynced(id: string, at: string): void {
     run('UPDATE inspections SET synced_at = ? WHERE client_generated_id = ?', [at, id]);
   },
+  /** The server accepted the lock and generated the report. Bookkeeping only. */
+  markServerLocked(id: string, at: string, reportSha256: string | null): void {
+    run('UPDATE inspections SET server_locked_at = ?, server_report_sha256 = ?, synced_at = ? WHERE client_generated_id = ?', [at, reportSha256, at, id]);
+  },
   /** Local rows are retained 30 days after confirmed sync, then purged (spec 7.6). */
   purgeSyncedBefore(cutoffIso: string): number {
     const ids = all<{client_generated_id: string}>(
@@ -354,6 +358,25 @@ export const syncQueue = {
   pending(): SyncQueueRow[] {
     return all<SyncQueueRow>(`SELECT * FROM sync_queue WHERE status = 'pending' ORDER BY id`);
   },
+  /** Every unfinished row, oldest first, with its error state. */
+  unfinished(): SyncQueueRow[] {
+    return all<SyncQueueRow>(`SELECT * FROM sync_queue WHERE status <> 'done' ORDER BY id`);
+  },
+  unfinishedForInspection(inspectionId: string): SyncQueueRow[] {
+    return all<SyncQueueRow>(`SELECT * FROM sync_queue WHERE status <> 'done' AND inspection_id = ? ORDER BY id`, [inspectionId]);
+  },
+  /** Persisted error state for the status bar: survives app restarts, unlike the last run's report. */
+  errorSummary(): {erroredCount: number; failedCount: number; lastError: string | null; lastAttemptAt: string | null} {
+    const counts = all<{errored: number; failed: number}>(
+      `SELECT SUM(CASE WHEN last_error IS NOT NULL THEN 1 ELSE 0 END) AS errored,
+              SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) AS failed
+       FROM sync_queue WHERE status <> 'done'`,
+    )[0];
+    const last = all<{last_error: string; last_attempt_at: string | null}>(
+      `SELECT last_error, last_attempt_at FROM sync_queue WHERE status <> 'done' AND last_error IS NOT NULL ORDER BY last_attempt_at DESC, id DESC LIMIT 1`,
+    )[0];
+    return {erroredCount: counts?.errored ?? 0, failedCount: counts?.failed ?? 0, lastError: last?.last_error ?? null, lastAttemptAt: last?.last_attempt_at ?? null};
+  },
   pendingCount(): number {
     return all<{n: number}>(`SELECT COUNT(*) AS n FROM sync_queue WHERE status = 'pending'`)[0]?.n ?? 0;
   },
@@ -364,9 +387,17 @@ export const syncQueue = {
     run(`UPDATE sync_queue SET status = 'done', last_error = NULL WHERE id = ?`, [id]);
   },
   markError(id: number, error: string, giveUp: boolean): void {
-    run(`UPDATE sync_queue SET attempts = attempts + 1, last_error = ?, status = ? WHERE id = ?`, [error, giveUp ? 'failed' : 'pending', id]);
+    run(`UPDATE sync_queue SET attempts = attempts + 1, last_error = ?, last_attempt_at = ?, status = ? WHERE id = ?`, [
+      error,
+      new Date().toISOString(),
+      giveUp ? 'failed' : 'pending',
+      id,
+    ]);
   },
   retryFailed(): void {
     run(`UPDATE sync_queue SET status = 'pending', attempts = 0 WHERE status = 'failed'`);
+  },
+  retryRow(id: number): void {
+    run(`UPDATE sync_queue SET status = 'pending', attempts = 0 WHERE id = ?`, [id]);
   },
 };

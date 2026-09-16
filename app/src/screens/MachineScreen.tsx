@@ -155,7 +155,8 @@ export function MachineScreen() {
                 <Text style={{color: item.status === 'locked' ? colors.low : colors.medium, fontWeight: '700'}}>{item.status.toUpperCase()}</Text>
               </View>
               <Muted>
-                hour meter {item.hour_meter_reading} · checklist {item.checklist_version} · {item.synced_at ? 'synced' : 'not synced'}
+                hour meter {item.hour_meter_reading} · checklist {item.checklist_version} ·{' '}
+                {item.status === 'locked' ? (item.server_locked_at ? 'recorded on server' : 'LOCKED ON TABLET ONLY, not yet on server') : item.synced_at ? 'synced' : 'not synced'}
               </Muted>
             </Card>
           </Pressable>

@@ -1,5 +1,5 @@
 import {open, type DB} from '@op-engineering/op-sqlite';
-import {SCHEMA_SQL, SCHEMA_VERSION} from './schema';
+import {COLUMN_MIGRATIONS, SCHEMA_SQL, SCHEMA_VERSION} from './schema';
 
 let db: DB | null = null;
 
@@ -10,6 +10,12 @@ export function getDb(): DB {
     db.executeSync('PRAGMA foreign_keys = ON');
     for (const sql of SCHEMA_SQL) {
       db.executeSync(sql);
+    }
+    for (const m of COLUMN_MIGRATIONS) {
+      const cols = (db.executeSync(`PRAGMA table_info(${m.table})`).rows ?? []) as Array<{name: string}>;
+      if (!cols.some(c => c.name === m.column)) {
+        db.executeSync(`ALTER TABLE ${m.table} ADD COLUMN ${m.column} ${m.ddl}`);
+      }
     }
     db.executeSync(`INSERT OR REPLACE INTO meta(key, value) VALUES ('schema_version', ?)`, [String(SCHEMA_VERSION)]);
   }

@@ -12,7 +12,7 @@ import type {
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string, public details?: unknown) {
-    super(message);
+    super(`${code}: ${message}`);
   }
   get isLocked(): boolean {
     return this.status === 409;
@@ -45,6 +45,33 @@ export class ApiClient {
     this.config.token = token;
   }
 
+  get baseUrl(): string {
+    return this.config.baseUrl;
+  }
+
+  get token(): string | null {
+    return this.config.token;
+  }
+
+  /**
+   * Upload URLs are resolved against the host the device already reaches the
+   * API on. Path-only URLs (dev storage without API_BASE_URL) are joined to the
+   * base URL. An absolute dev-storage URL ("/dev/storage/...") keeps its path but
+   * takes the API's origin: dev storage is served by the API itself, so any other
+   * host (e.g. "localhost" inside an Android emulator) is wrong by construction.
+   * Real S3 URLs are on a different host by design and are used as returned.
+   */
+  resolveUploadUrl(url: string): string {
+    if (url.startsWith('/')) {
+      return `${this.config.baseUrl}${url}`;
+    }
+    const m = /^(https?:\/\/[^/]+)(\/dev\/storage\/.*)$/.exec(url);
+    if (m) {
+      return `${this.config.baseUrl}${m[2]}`;
+    }
+    return url;
+  }
+
   private async request<T>(method: string, path: string, body?: unknown, raw?: {bytes: string | Blob | ArrayBuffer; contentType: string}): Promise<T> {
     const f = this.config.fetchImpl ?? fetch;
     const headers: Record<string, string> = {
@@ -63,7 +90,12 @@ export class ApiClient {
       headers['Content-Type'] = 'application/json';
       payload = JSON.stringify(body);
     }
-    const res = await f(`${this.config.baseUrl}${path}`, {method, headers, body: payload});
+    let res: Response;
+    try {
+      res = await f(`${this.config.baseUrl}${path}`, {method, headers, body: payload});
+    } catch (e) {
+      throw new ApiError(0, 'network', `could not reach ${this.config.baseUrl}: ${(e as Error).message}`);
+    }
     const skew = res.headers.get('X-Clock-Skew-Seconds');
     if (skew) {
       this.clockSkewSeconds = parseInt(skew, 10);
@@ -88,9 +120,15 @@ export class ApiClient {
   /** PUT raw bytes to a presigned URL (S3 or the dev storage endpoint). No auth header. */
   async putPresigned(url: string, bytes: Blob | ArrayBuffer, contentType: string): Promise<void> {
     const f = this.config.fetchImpl ?? fetch;
-    const res = await f(url, {method: 'PUT', headers: {'Content-Type': contentType}, body: bytes as RequestInit['body']});
+    const target = this.resolveUploadUrl(url);
+    let res: Response;
+    try {
+      res = await f(target, {method: 'PUT', headers: {'Content-Type': contentType}, body: bytes as RequestInit['body']});
+    } catch (e) {
+      throw new ApiError(0, 'upload_unreachable', `could not reach ${target}: ${(e as Error).message}`);
+    }
     if (!res.ok) {
-      throw new ApiError(res.status, 'upload_failed', `upload failed with ${res.status}`);
+      throw new ApiError(res.status, 'upload_failed', `upload to ${target} failed with HTTP ${res.status}`);
     }
   }
 

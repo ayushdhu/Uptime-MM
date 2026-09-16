@@ -4,7 +4,7 @@ import {ApiClient} from '../api/client';
 import {getDb, getMeta, setMeta} from '../db/database';
 import {syncQueue, photos as photosRepo} from '../db/repositories';
 import type {User} from '../domain/types';
-import {SyncEngine, type SyncReport} from '../sync/engine';
+import {SyncEngine, nextRetryDelayMs, type SyncReport} from '../sync/engine';
 import {nativeFileSystem} from '../services/files';
 import {getDeviceId} from '../services/device';
 
@@ -16,7 +16,12 @@ export interface SyncStatus {
   lastSyncAt: string | null;
   running: boolean;
   online: boolean;
+  /** Most recent persisted failure reason from the queue (survives restarts). */
   lastError: string | null;
+  lastErrorAt: string | null;
+  erroredCount: number;
+  failedCount: number;
+  nextRetryAt: string | null;
   clockSkewSeconds: number;
 }
 
@@ -41,16 +46,23 @@ export function AppProvider({children}: {children: React.ReactNode}) {
   const [user, setUser] = useState<User | null>(null);
   const [deviceId, setDeviceId] = useState('');
   const [apiUrl, setApiUrlState] = useState(DEFAULT_API_URL);
-  const [sync, setSync] = useState<SyncStatus>({pendingCount: 0, pendingPhotos: 0, lastSyncAt: null, running: false, online: false, lastError: null, clockSkewSeconds: 0});
+  const [sync, setSync] = useState<SyncStatus>({pendingCount: 0, pendingPhotos: 0, lastSyncAt: null, running: false, online: false, lastError: null, lastErrorAt: null, erroredCount: 0, failedCount: 0, nextRetryAt: null, clockSkewSeconds: 0});
   const apiRef = useRef(new ApiClient({baseUrl: DEFAULT_API_URL, token: null, deviceId: ''}));
   const engineRef = useRef<SyncEngine | null>(null);
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const failedRuns = useRef(0);
 
   const refreshSyncStatus = useCallback(() => {
+    const errors = syncQueue.errorSummary();
     setSync(s => ({
       ...s,
       pendingCount: syncQueue.pendingCount(),
       pendingPhotos: photosRepo.pendingLocalCount(),
       lastSyncAt: getMeta('last_sync_at'),
+      lastError: errors.lastError,
+      lastErrorAt: errors.lastAttemptAt,
+      erroredCount: errors.erroredCount,
+      failedCount: errors.failedCount,
       clockSkewSeconds: apiRef.current.clockSkewSeconds,
     }));
   }, []);
@@ -112,23 +124,39 @@ export function AppProvider({children}: {children: React.ReactNode}) {
     [deviceId],
   );
 
-  const syncNow = useCallback(async () => {
+  const syncNow = useCallback(async (): Promise<SyncReport | null> => {
     const engine = engineRef.current;
     if (!engine || engine.isRunning || !user) {
       return null;
     }
-    setSync(s => ({...s, running: true, lastError: null}));
-    try {
-      const report = await engine.run();
-      setSync(s => ({...s, lastError: report.errors[0] ?? null}));
-      return report;
-    } catch (e) {
-      setSync(s => ({...s, lastError: (e as Error).message}));
-      return null;
-    } finally {
-      setSync(s => ({...s, running: false}));
-      refreshSyncStatus();
+    if (retryTimer.current) {
+      clearTimeout(retryTimer.current);
+      retryTimer.current = null;
     }
+    setSync(s => ({...s, running: true, nextRetryAt: null}));
+    let report: SyncReport | null = null;
+    let runError: string | null = null;
+    try {
+      report = await engine.run();
+    } catch (e) {
+      runError = (e as Error).message;
+    }
+    setSync(s => ({...s, running: false}));
+    refreshSyncStatus();
+    // The queue retries on its own: back off after failures, keep going while work is pending.
+    const stillPending = syncQueue.pendingCount() > 0;
+    const hadFailure = runError !== null || (report?.failed ?? 0) > 0;
+    failedRuns.current = hadFailure ? failedRuns.current + 1 : 0;
+    if (stillPending) {
+      const delay = hadFailure ? nextRetryDelayMs(failedRuns.current) : 5_000;
+      setSync(s => ({...s, nextRetryAt: new Date(Date.now() + delay).toISOString(), lastError: runError ?? s.lastError}));
+      retryTimer.current = setTimeout(() => {
+        retryTimer.current = null;
+        syncNow();
+      }, delay);
+    }
+    return report;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, refreshSyncStatus]);
 
   // Auto sync when we come online with work pending.

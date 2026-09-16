@@ -6,14 +6,20 @@ import {useApp} from '../state/AppContext';
 export function SyncBar({onOpen}: {onOpen?: () => void}) {
   const {sync, syncNow} = useApp();
   const last = sync.lastSyncAt ? new Date(sync.lastSyncAt).toLocaleString() : 'never';
-  const color = sync.lastError ? '#B3261E' : sync.pendingCount > 0 ? '#B26A00' : '#2E7D32';
+  const color = sync.erroredCount > 0 || sync.lastError ? '#B3261E' : sync.pendingCount > 0 ? '#B26A00' : '#2E7D32';
   return (
     <View style={[styles.bar, {borderLeftColor: color}]}>
       <Pressable onPress={onOpen} style={{flex: 1}}>
         <Text style={styles.text}>
           {sync.online ? 'Online' : 'Offline'} · {sync.pendingCount} pending{sync.pendingPhotos ? ` (${sync.pendingPhotos} photos on device)` : ''} · last sync {last}
         </Text>
-        {sync.lastError ? <Text style={styles.err}>{sync.lastError}</Text> : null}
+        {sync.erroredCount > 0 || sync.lastError ? (
+          <Text style={styles.err}>
+            {sync.erroredCount > 0 ? `${sync.erroredCount} item${sync.erroredCount === 1 ? '' : 's'} failing to sync` : 'Sync failed'}
+            {sync.failedCount > 0 ? ` (${sync.failedCount} need attention)` : ''} · {sync.lastError}
+            {sync.nextRetryAt ? ` · retrying ${new Date(sync.nextRetryAt).toLocaleTimeString()}` : ''}
+          </Text>
+        ) : null}
         {sync.clockSkewSeconds > 600 ? <Text style={styles.err}>Device clock differs from server by {Math.round(sync.clockSkewSeconds / 60)} min</Text> : null}
       </Pressable>
       <Pressable accessibilityRole="button" disabled={sync.running} onPress={() => syncNow()} style={[styles.btn, sync.running && {opacity: 0.5}]}>

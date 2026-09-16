@@ -89,7 +89,7 @@ class ImmutabilityTest < ActiveSupport::TestCase
     create_photo(item: item)
     ack = create_signature(inspection: insp, signature_type: "high_severity_ack")
     event = HighSeverityEvent.create!(inspection_item: item, machine: @machine, opened_at: Time.current,
-                                      conversation_checklist: HighSeverityEvent::CONVERSATION_STEPS.index_with { true },
+                                      conversation_checklist: HighSeverityEvent::CONVERSATION_STEPS.index_with { true }.merge("owner_initials" => "OO"),
                                       machine_out_of_service: false, recheck_interval_days: 7, repair_plan: "replace hose",
                                       owner_signature: ack, client_generated_id: SecureRandom.uuid)
     create_signature(inspection: insp)

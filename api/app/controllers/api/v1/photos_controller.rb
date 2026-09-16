@@ -3,6 +3,10 @@
 module Api
   module V1
     class PhotosController < BaseController
+      # Payloads are flat; wrapping them under :photo only produces
+      # "Unpermitted parameter: :photo" noise on every confirm.
+      wrap_parameters false
+
       # POST /api/v1/photos/presign
       #   { purpose: "photo"|"signature", inspection_item_id | inspection_id, client_generated_id, content_type }
       # -> { upload_url, s3_key }
@@ -12,6 +16,10 @@ module Api
         case purpose
         when "photo"
           item = find_item(params.require(:inspection_item_id))
+          unless item
+            skip_authorization
+            return render json: { error: "item_not_found", message: "no inspection item with that id or client_generated_id" }, status: :not_found
+          end
           authorize item.inspection, :update?
           return render_locked if item.inspection.locked?
           ext = params[:content_type].to_s == "image/png" ? "png" : "jpg"
@@ -38,6 +46,11 @@ module Api
         attrs = params.permit(:s3_key, :sha256, :inspection_item_id, :client_generated_id, :captured_at, :byte_size,
                               :width, :height)
         item = find_item(attrs.delete(:inspection_item_id))
+        unless item
+          skip_authorization
+          return render json: { error: "item_not_found", message: "no inspection item with that id or client_generated_id; sync items before photos" },
+                        status: :not_found
+        end
         authorize item.inspection, :update?
         if (existing = Photo.find_by(client_generated_id: attrs[:client_generated_id]))
           return render_record(existing, Serializers::Photo, extra: { existing: true })
@@ -48,15 +61,18 @@ module Api
         photo = item.photos.create!(attrs.merge(byte_size: Storage.byte_size(attrs[:s3_key]), uploaded_at: Time.current))
         render_record(photo, Serializers::Photo, status: :created)
       rescue HashVerifier::Mismatch => e
-        render json: { error: "hash_mismatch", message: e.message }, status: :unprocessable_content
+        render json: { error: "hash_mismatch", message: "stored object does not match the supplied SHA-256: #{e.message}. " \
+                                                       "Re-upload the object and confirm again." }, status: :unprocessable_content
       rescue Storage::NotFound
-        render json: { error: "object_missing", message: "upload the object before confirming" }, status: :unprocessable_content
+        render json: { error: "object_missing", message: "no object at #{attrs[:s3_key]}; upload it to the presigned URL before confirming" },
+               status: :unprocessable_content
       end
 
       private
 
       def find_item(value)
-        InspectionItem.where(id: value).or(InspectionItem.where(client_generated_id: value)).includes(:inspection).first!
+        return nil if value.blank?
+        InspectionItem.where(id: value).or(InspectionItem.where(client_generated_id: value)).includes(:inspection).first
       end
     end
   end

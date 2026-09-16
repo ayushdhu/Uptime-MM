@@ -39,17 +39,22 @@ export async function fileSize(path: string): Promise<number> {
 
 const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-/** Dependency free base64 decode (no Buffer/atob assumptions on the RN runtime). */
+/**
+ * Dependency free base64 decode (no Buffer/atob assumptions on the RN runtime).
+ * Byte length is derived from the number of significant characters only; an
+ * earlier version also subtracted the padding count, which truncated every
+ * file whose size was not a multiple of 3 and produced server side SHA-256
+ * mismatches on confirm (pilot run 1b).
+ */
 export function base64ToArrayBuffer(base64: string): ArrayBuffer {
   const clean = base64.replace(/[^A-Za-z0-9+/]/g, '');
-  const padding = (base64.match(/=+$/) || [''])[0].length;
-  const length = Math.floor((clean.length * 3) / 4) - padding;
+  const length = Math.floor((clean.length * 3) / 4);
   const bytes = new Uint8Array(length);
   let buffer = 0;
   let bits = 0;
   let out = 0;
   for (let i = 0; i < clean.length; i++) {
-    buffer = (buffer << 6) | B64.indexOf(clean[i]);
+    buffer = ((buffer << 6) | B64.indexOf(clean[i])) & 0xffffff;
     bits += 6;
     if (bits >= 8) {
       bits -= 8;

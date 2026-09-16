@@ -34,7 +34,7 @@ class PilotFlowTest < ActionDispatch::IntegrationTest
     machine = body["data"]
     assert_equal "SS-1001", machine["serial_number"]
     assert_equal "tier_4", machine["emissions_tier"]
-    assert_equal "alpha-1", machine["checklist_version"]
+    assert_equal "alpha-2", machine["checklist_version"]
 
     # Duplicate serial opens the existing machine instead of creating a new one.
     post "/api/v1/machines", params: { machine: wizard.merge(nfc_tag_id: nil) }, headers: auth(@senior_token), as: :json
@@ -98,7 +98,9 @@ class PilotFlowTest < ActionDispatch::IntegrationTest
 
     # Photos: presign, upload, confirm with hash verification. Wrong hash is rejected.
     high_item = server_items.find { |i| i["severity"] == "high" }
-    server_items.reject { |i| i["skipped"] }.each do |item|
+    optional_keys = template_items.reject { |t| t["photo_required"] }.map { |t| t["key"] }
+    assert optional_keys.any?, "alpha-2 marks behavioural function tests as photo optional"
+    server_items.reject { |i| i["skipped"] || optional_keys.include?(i["template_item_key"]) }.each do |item|
       upload_photo!(item, "photo-of-#{item['template_item_key']}")
     end
     bad_key = presign!(server_items.first)
@@ -108,16 +110,33 @@ class PilotFlowTest < ActionDispatch::IntegrationTest
                                    headers: auth(@tech_token), as: :json
     assert_response :unprocessable_content
     assert_equal "hash_mismatch", body["error"]
+    assert_match(/does not match the supplied SHA-256/, body["message"])
+    post "/api/v1/photos/confirm", params: { s3_key: "inspections/nothing/photos/x.jpg", sha256: "f" * 64, inspection_item_id: server_items.first["id"],
+                                             client_generated_id: SecureRandom.uuid, captured_at: Time.current.iso8601 },
+                                   headers: auth(@tech_token), as: :json
+    assert_response :unprocessable_content
+    assert_equal "object_missing", body["error"]
+    assert_match(/upload it to the presigned URL/, body["message"])
+    post "/api/v1/photos/confirm", params: { s3_key: bad_key[:s3_key], sha256: "f" * 64, inspection_item_id: SecureRandom.uuid,
+                                             client_generated_id: SecureRandom.uuid, captured_at: Time.current.iso8601 },
+                                   headers: auth(@tech_token), as: :json
+    assert_response :not_found
+    assert_equal "item_not_found", body["error"]
+    # Presign URLs are path-only without API_BASE_URL so the device resolves them against its own API host.
+    assert bad_key[:upload_url].start_with?("/dev/storage/"), bad_key[:upload_url]
 
     # 3. High severity flow: conversation checklist + owner signature + event.
     post "/api/v1/inspections/#{inspection['id']}/lock", headers: auth(@tech_token), as: :json
     assert_response :unprocessable_content, "cannot lock before the High flow and checkout signature"
-    assert_includes body["details"].join, "High"
+    assert_equal "not_lockable", body["error"]
+    assert_includes body["details"].join, "High item(s) without a signed"
+    assert_includes body["details"].join, "no checkout signature"
+    assert_not_includes body["details"].join, "missing a required photo", "photo-optional items must not block locking"
 
     ack_sig_key = presign_signature!(inspection["id"])
     put ack_sig_key[:upload_url], params: png_bytes, headers: { "Content-Type" => "image/png" }
     ack_sig = { client_generated_id: ack_sig_key[:client_id], signature_type: "high_severity_ack", signer_name: "Owner Olly",
-                signer_role: "owner", signer_statement: "I understand the hose is leaking and we will park it until fixed.",
+                signer_role: "owner", signer_statement: nil, # optional since ADR-0011
                 image_s3_key: ack_sig_key[:s3_key], sha256: Digest::SHA256.hexdigest(png_bytes), signed_at: Time.current.iso8601 }
     post "/api/v1/inspections/#{inspection['id']}/signatures", params: { signature: ack_sig }, headers: auth(@tech_token), as: :json
     assert_response :created
@@ -126,13 +145,19 @@ class PilotFlowTest < ActionDispatch::IntegrationTest
     event_payload = { client_generated_id: SecureRandom.uuid, inspection_item_id: high_item["client_generated_id"],
                       opened_at: Time.current.iso8601,
                       conversation_checklist: { item_identified_and_shown: true, photo_shown: true, recommendation_stated: true,
-                                                decision_recorded: false },
+                                                decision_recorded: false, owner_initials: "OO" },
                       machine_out_of_service: true, owner_signature_id: ack_sig[:client_generated_id] }
     post "/api/v1/high_severity_events", params: { high_severity_event: event_payload }, headers: auth(@tech_token), as: :json
     assert_response :unprocessable_content, "every conversation step must be ticked"
     event_payload[:conversation_checklist][:decision_recorded] = true
+    event_payload[:conversation_checklist][:owner_initials] = ""
+    post "/api/v1/high_severity_events", params: { high_severity_event: event_payload }, headers: auth(@tech_token), as: :json
+    assert_response :unprocessable_content, "owner initials are required"
+    assert_match(/owner_initials/, body["details"].join)
+    event_payload[:conversation_checklist][:owner_initials] = "OO"
     post "/api/v1/high_severity_events", params: { high_severity_event: event_payload }, headers: auth(@tech_token), as: :json
     assert_response :created
+    assert_equal "OO", body["data"]["conversation_checklist"]["owner_initials"]
     event = body["data"]
     assert_equal ack_signature_id, event["owner_signature_id"]
     assert_nil event["resolved_at"]
@@ -193,7 +218,7 @@ class PilotFlowTest < ActionDispatch::IntegrationTest
     assert_equal 1, history["open_high_severity_events"].size
     assert_equal high_item["id"], history["open_high_severity_events"].first["inspection_item_id"]
     assert_equal 1, history["inspections"].size
-    assert history["photos"].size >= template_items.size - 1
+    assert history["photos"].size >= template_items.size - optional_keys.size - 1, "one photo per required item (one item was skipped)"
     assert history["inspections"].first["report_available"]
 
     second = { client_generated_id: SecureRandom.uuid, machine_id: machine["id"], inspection_type: "walkthrough",

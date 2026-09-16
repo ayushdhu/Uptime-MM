@@ -1,7 +1,7 @@
 // Local SQLite schema. Mirrors the inspection chain tables plus reference
 // data and the sync queue (spec section 7). The device is the system of
 // record until the server acknowledges.
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const SCHEMA_SQL: string[] = [
   `CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)`,
@@ -55,4 +55,11 @@ export const SCHEMA_SQL: string[] = [
      id INTEGER PRIMARY KEY AUTOINCREMENT, entity_type TEXT NOT NULL, entity_id TEXT NOT NULL, inspection_id TEXT NOT NULL,
      attempts INTEGER NOT NULL DEFAULT 0, last_error TEXT, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS sync_queue_status ON sync_queue(status, id)`,
+];
+
+/** Columns added after v1. Applied with ALTER TABLE when missing (SQLite has no IF NOT EXISTS for columns). */
+export const COLUMN_MIGRATIONS: Array<{table: string; column: string; ddl: string}> = [
+  {table: 'sync_queue', column: 'last_attempt_at', ddl: 'TEXT'},
+  {table: 'inspections', column: 'server_locked_at', ddl: 'TEXT'},
+  {table: 'inspections', column: 'server_report_sha256', ddl: 'TEXT'},
 ];

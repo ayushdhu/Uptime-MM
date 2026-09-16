@@ -23,8 +23,14 @@ class HighSeverityEvent < ApplicationRecord
                                     unless: :machine_out_of_service
   validates :repair_plan, presence: true, unless: :machine_out_of_service
   validate :conversation_checklist_complete
+  validate :owner_initials_present
   validate :item_is_high
   validate :signature_is_high_ack
+
+  # ADR-0011: the owner initials the acknowledgment; the free text statement is optional.
+  def owner_initials
+    conversation_checklist.is_a?(Hash) ? conversation_checklist["owner_initials"].to_s.strip : ""
+  end
 
   scope :open, -> { where(resolved_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
@@ -43,6 +49,10 @@ class HighSeverityEvent < ApplicationRecord
   def conversation_checklist_complete
     missing = CONVERSATION_STEPS.reject { |s| conversation_checklist.is_a?(Hash) && conversation_checklist[s] == true }
     errors.add(:conversation_checklist, "incomplete: #{missing.join(', ')}") if missing.any?
+  end
+
+  def owner_initials_present
+    errors.add(:conversation_checklist, "owner_initials required (1 to 6 characters)") unless owner_initials.length.between?(1, 6)
   end
 
   def item_is_high

@@ -4,7 +4,7 @@ import {useFocusEffect, useNavigation, useRoute, type RouteProp} from '@react-na
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {Button, Card, Input, Label, Muted, PassFailButtons, ProgressBar, Screen, TierButtons, colors} from '../components/ui';
 import {inspections as inspectionsRepo, items as itemsRepo, photos as photosRepo} from '../db/repositories';
-import {itemCompletionError, forcedSeverity} from '../domain/checklist';
+import {itemCompletionError, forcedSeverity, photoRequired} from '../domain/checklist';
 import type {InspectionItem, MeasurementDetail, Photo, Severity, TemplateItem} from '../domain/types';
 import {gradeItem, markItemDone, pendingHighItems, skipItem, templateItemByKey} from '../services/inspectionFlow';
 import {photoUri, requestPhotoCapture} from '../services/photos';
@@ -71,7 +71,8 @@ export function WalkthroughScreen() {
   }
   const template = templates.get(item.template_item_key);
   const doneCount = items.filter(i => i.done).length;
-  const photoLocked = photos.length === 0 && (template ? template.result_type !== 'measurement' || template.photo_required : true);
+  const needsPhoto = photoRequired(template, item);
+  const photoLocked = needsPhoto && photos.length === 0;
   const forced = template ? forcedSeverity(template, detail) : null;
 
   const refresh = (updated: InspectionItem) => {
@@ -197,7 +198,7 @@ export function WalkthroughScreen() {
           </Card>
         ) : null}
         <Card>
-          <Label>Photos ({photos.length}) — required before grading</Label>
+          <Label>{needsPhoto ? `Photos (${photos.length}) — required before grading` : `Photos (${photos.length}) — optional: behavioural test, the pass/fail is the evidence`}</Label>
           <ScrollView horizontal style={{marginBottom: 8}}>
             {photos.map(p => {
               const uri = photoUri(p);

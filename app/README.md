@@ -58,9 +58,21 @@ adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 
 For a physical tablet talking to a laptop's Rails server on the same network,
 set the server URL on the login screen to `http://<laptop-ip>:3000` and run
-Rails with `bin/rails server -b 0.0.0.0` and `API_BASE_URL=http://<laptop-ip>:3000`
-so dev-storage upload URLs resolve from the tablet. Debug builds allow
+Rails with `bin/rails server -b 0.0.0.0`. On the Android emulator use
+`http://10.0.2.2:3000` (the emulator's alias for the host machine; `localhost`
+is the emulator itself). Dev-storage upload URLs are resolved against the
+server URL you entered, so `API_BASE_URL` is not needed. Debug builds allow
 cleartext HTTP; release builds do not.
+
+Sync never fails silently: the status bar shows how many items are failing and
+the latest reason, the Sync screen lists every queued row with its attempts,
+last failure and a per-row retry, and failures retry automatically with
+backoff. An inspection that is locked on the tablet but not yet accepted by
+the server says so on the report, inspection and machine screens, with the
+outstanding list.
+
+On an emulator without NFC, debug builds show a "simulate tag" field on the
+home screen that runs the same tag resolution path.
 
 ## Release signing
 
@@ -134,5 +146,7 @@ npm run lint
 `react-native-nfc-manager`, `react-native-image-picker` (camera, `saveToPhotos:
 false`), `@op-engineering/op-sqlite`, `react-native-fs` (private storage,
 `hash(path, 'sha256')`, `getFSInfo`), `react-native-signature-canvas` +
-`react-native-webview`, `@react-native-community/netinfo`,
+`react-native-webview`, `react-native-pdf` + `react-native-blob-util` (the
+server PDF is fetched with the bearer token and rendered in-app; Android's
+WebView cannot display PDFs), `@react-native-community/netinfo`,
 `react-native-device-info`.

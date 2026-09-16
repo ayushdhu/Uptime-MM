@@ -92,7 +92,11 @@ module Storage
 
     def local? = true
 
-    # Presigned PUTs point at the dev-only upload endpoint (see routes).
+    # Presigned URLs point at the dev-only storage endpoint served by this API.
+    # Without API_BASE_URL they are path-only ("/dev/storage/<key>") so the
+    # device resolves them against the host it already reaches the API on.
+    # An absolute "http://localhost:3000/..." is unreachable from an Android
+    # emulator (localhost is the emulator itself), which stalled pilot run 1.
     def presign_put(key, content_type:, expires_in: 15.minutes)
       "#{base_url}/dev/storage/#{key}"
     end
@@ -101,11 +105,19 @@ module Storage
       "#{base_url}/dev/storage/#{key}"
     end
 
+    # Write to a temp file, flush and fsync, then rename into place: a reader
+    # (the confirm hash) can never observe a partial object.
     def write(key, io, content_type: nil)
       path = path_for(key)
       FileUtils.mkdir_p(path.dirname)
       data = io.respond_to?(:read) ? io.read : io
-      File.binwrite(path, data)
+      tmp = path.sub_ext("#{path.extname}.part-#{SecureRandom.hex(4)}")
+      File.open(tmp, "wb") do |f|
+        f.write(data)
+        f.flush
+        f.fsync
+      end
+      File.rename(tmp, path)
     end
 
     def read(key)
@@ -139,7 +151,7 @@ module Storage
     private
 
     def base_url
-      ENV.fetch("API_BASE_URL", "http://localhost:3000")
+      ENV["API_BASE_URL"].to_s.sub(%r{/+\z}, "")
     end
   end
 end

@@ -68,17 +68,26 @@ class Inspection < ApplicationRecord
 
   # Every High item must have a signed high_severity_event and the visit must
   # be signed off before the inspection can lock (spec 5.4 and 6).
+  # Specific, readable reasons: the device shows these to the technician.
   def lockable_errors
     errs = []
-    errs << "every item needs a result or an explicit skip" if items.where(skipped: false, severity: nil, pass: nil).where(result_type: %w[tiered pass_fail]).exists?
-    errs << "every non-skipped tiered/pass_fail item needs at least one photo" if items_missing_photos.exists?
-    errs << "every High item needs a completed high severity flow" if unresolved_high_items_without_events.exists?
-    errs << "visit checkout signature required" unless signatures.visit_checkout.exists?
+    unresulted = items.where(skipped: false, severity: nil, pass: nil).where(result_type: %w[tiered pass_fail])
+    errs << "#{unresulted.count} item(s) have no result and were not skipped" if unresulted.exists?
+    missing = items_missing_photos
+    errs << "#{missing.count} item(s) missing a required photo: #{missing.limit(5).pluck(:component_name).join(', ')}" if missing.exists?
+    highs = unresolved_high_items_without_events
+    errs << "#{highs.count} High item(s) without a signed High severity acknowledgment" if highs.exists?
+    errs << "no checkout signature" unless signatures.visit_checkout.exists?
     errs
   end
 
+  # Photo required per template item (`photo_required`), not universally. A
+  # carried-forward recheck always needs a fresh photo (spec 6).
   def items_missing_photos
-    items.where(skipped: false, result_type: %w[tiered pass_fail]).left_outer_joins(:photos).where(photos: { id: nil })
+    optional_keys = checklist_template.items.reject { |i| i["photo_required"] }.map { |i| i["key"] }
+    scope = items.where(skipped: false).left_outer_joins(:photos).where(photos: { id: nil })
+    scope.where(carried_forward_from_item_id: nil).where.not(template_item_key: optional_keys)
+         .or(scope.where.not(carried_forward_from_item_id: nil))
   end
 
   private

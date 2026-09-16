@@ -85,6 +85,7 @@ class ChecklistTemplate < ApplicationRecord
       errors.add(:items, "item #{idx} has invalid check_method") unless CHECK_METHODS.include?(item["check_method"])
       errors.add(:items, "item #{idx} has invalid cadence") unless CADENCES.include?(item["cadence"])
       errors.add(:items, "item #{idx} default_if_ambiguous must be round_up") unless item["default_if_ambiguous"] == "round_up"
+      errors.add(:items, "item #{idx} photo_required must be true or false") unless [true, false].include?(item["photo_required"])
       if item["result_type"] != "pass_fail" && item["tier_criteria"].blank?
         errors.add(:items, "item #{idx} (#{item['key']}) needs tier_criteria (shared criteria must be merged at seed time)")
       end

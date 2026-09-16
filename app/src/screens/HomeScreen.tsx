@@ -20,6 +20,7 @@ export function HomeScreen() {
   const [results, setResults] = useState<Machine[]>([]);
   const [nfc, setNfc] = useState<NfcStatus>('ready');
   const [resolving, setResolving] = useState(false);
+  const [simTag, setSimTag] = useState('');
 
   const onTag = useCallback(
     async (tagId: string) => {
@@ -87,6 +88,12 @@ export function HomeScreen() {
         </Card>
       )}
       <Input value={query} onChangeText={search} placeholder="Serial number or customer name" autoCapitalize="characters" style={styles.search} />
+      {__DEV__ ? (
+        <View style={styles.simRow}>
+          <Input value={simTag} onChangeText={setSimTag} placeholder="DEV: simulate tag id (no NFC in emulator)" autoCapitalize="characters" style={styles.simInput} />
+          <Button title="Simulate tap" kind="secondary" onPress={() => simTag.trim() && onTag(simTag.trim().toUpperCase())} disabled={!simTag.trim()} style={styles.simBtn} />
+        </View>
+      ) : null}
       <FlatList
         data={results}
         keyExtractor={m => m.id}
@@ -116,5 +123,8 @@ const styles = StyleSheet.create({
   nfcOff: {borderColor: colors.medium},
   nfcText: {fontSize: 17, fontWeight: '600', color: colors.text, textAlign: 'center'},
   search: {marginTop: 4},
+  simRow: {flexDirection: 'row', gap: 8, alignItems: 'center', marginTop: 6},
+  simInput: {flex: 1},
+  simBtn: {marginTop: 0},
   serial: {fontSize: 18, fontWeight: '700', color: colors.text},
 });

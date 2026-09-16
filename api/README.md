@@ -20,10 +20,18 @@ Postgres connection comes from `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`
 Without `S3_BUCKET` set, object storage runs on local disk under
 `tmp/storage/<env>` and presigned upload URLs point at the dev-only
 `PUT /dev/storage/*key` endpoint, so the whole flow (presign, upload, server side
-SHA-256 verification, PDF report) works offline. Set `S3_BUCKET`, `AWS_REGION`
-and the usual AWS credentials (plus `S3_ENDPOINT` / `S3_FORCE_PATH_STYLE=1` for
-non-AWS stores) to use real object storage. `API_BASE_URL` is the public URL
-the device should use for dev-storage uploads.
+SHA-256 verification, PDF report) works offline. Presigned dev URLs are
+path-only (`/dev/storage/<key>`) so the device resolves them against whatever
+host it reaches the API on (an Android emulator reaches a local API at
+`10.0.2.2:3000`, never `localhost`). Set `API_BASE_URL` only if the uploads
+must go to a different public URL. Set `S3_BUCKET`, `AWS_REGION` and the usual
+AWS credentials (plus `S3_ENDPOINT` / `S3_FORCE_PATH_STYLE=1` for non-AWS
+stores) to use real object storage.
+
+Checklist templates are seeded at version `alpha-2`. After re-seeding with a
+newer version, `bin/rails uptime:templates:upgrade_machines` points every
+active machine at the highest published version for its variant (past
+inspections keep the version they ran against).
 
 Seeded pilot logins (non-production only): `admin@uptime.local` /
 `changeme-admin`, `senior@uptime.local` / `changeme-senior`,
@@ -70,11 +78,11 @@ logs clock skew over 10 minutes and echoes it in `X-Clock-Skew-Seconds`.
 | POST | `/inspections` | idempotent on `client_generated_id`; records discrepancy alerts |
 | POST | `/inspections/:id/items` | batch, idempotent per item `client_generated_id` |
 | POST | `/photos/presign` | `{ purpose: photo|signature, inspection_item_id|inspection_id, client_generated_id, content_type }` |
-| POST | `/photos/confirm` | server recomputes SHA-256; `422 hash_mismatch` on mismatch |
+| POST | `/photos/confirm` | server recomputes SHA-256; errors are `422 hash_mismatch`, `422 object_missing`, `404 item_not_found`, each with a `message` |
 | POST | `/inspections/:id/signatures` | `visit_checkout` or `high_severity_ack` |
-| POST | `/high_severity_events` | requires every conversation step ticked and a `high_severity_ack` signature |
+| POST | `/high_severity_events` | requires every conversation step ticked, `conversation_checklist.owner_initials`, and a `high_severity_ack` signature (statement optional) |
 | POST | `/high_severity_events/:id/resolve` | senior technician+ |
-| POST | `/inspections/:id/lock` | validates completeness, locks, generates the PDF |
+| POST | `/inspections/:id/lock` | validates completeness (`422 not_lockable` with counted, named `details`), locks, generates the PDF |
 | GET | `/inspections/:id/report` | the PDF |
 | GET/POST | `/inspections/:id/notes` | append only; works on locked inspections |
 | GET | `/discrepancy_alerts` | admin |

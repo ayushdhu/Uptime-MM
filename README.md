@@ -75,10 +75,12 @@ tablet against the seeded skid steer's tag (serial `PILOT-SS-0001`, tag
 
 ## Verification
 
-- `api`: 19 tests / 296 assertions covering the Postgres immutability triggers,
-  ORM guards, template selection and versioning, and an end to end HTTP walk
+- `api`: 23 tests / 331 assertions covering the Postgres immutability triggers,
+  ORM guards, template selection and versioning, per-item photo rules, the
+  initials acknowledgment, confirm error bodies, and an end to end HTTP walk
   of the pilot flow (`test/integration/pilot_flow_test.rb`).
-- `app`: 27 jest tests covering the checklist rules, sync ordering, the report,
-  the sync engine running the real repositories on in-memory SQLite against a
-  fake server that checks hashes and idempotency, the NFC foreground lifecycle
-  and debounce, and the camera-permission-denied path.
+- `app`: 38 jest tests covering the checklist rules, sync ordering, the report,
+  the sync engine on in-memory SQLite against a fake server (hash checks,
+  idempotency, upload host resolution, unreachable hosts, 422 on confirm,
+  refused locks), the NFC lifecycle, the camera-permission-denied path and the
+  base64 decoder at the pilot's exact photo sizes.

@@ -62,7 +62,7 @@ class ChecklistSeeder
       pf = item["pass_fail_criteria"] || {}
       out["tier_criteria"] ||= { "low" => pf["pass"], "medium" => nil, "high" => pf["fail"] }
     end
-    out["photo_required"] = true
+    out["photo_required"] = item.fetch("photo_required", true) == true
     out["default_if_ambiguous"] = "round_up"
     out["measurement"] ||= nil
     out["notes_to_tech"] ||= nil

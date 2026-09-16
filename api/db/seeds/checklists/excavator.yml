@@ -4,7 +4,7 @@
 machine_class: excavator
 drive_type: null
 has_def: null
-version: alpha-1
+version: alpha-2
 source: uptime_pm_checklists_alpha1.xlsx / tab 'Excavator'
 items:
 - key: bucket_and_get_teeth_adapters_side_cutters
@@ -661,7 +661,7 @@ items:
   check_method: function
   check_method_label: Function
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: all work, alarm immediate'
@@ -693,7 +693,7 @@ items:
   check_method: function
   check_method_label: Function
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: correct operation, return to neutral'
@@ -725,7 +725,7 @@ items:
   check_method: function
   check_method_label: Function
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: functions'

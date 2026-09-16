@@ -4,7 +4,7 @@
 machine_class: skid_steer
 drive_type: null
 has_def: null
-version: alpha-1
+version: alpha-2
 source: uptime_pm_checklists_alpha1.xlsx / tab 'Skid Steer'
 items:
 - key: machine_body_frame
@@ -367,7 +367,7 @@ items:
   check_method: function
   check_method_label: Function test
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: sounds immediately on reverse actuation, no delay'
@@ -723,7 +723,7 @@ items:
   check_method: function
   check_method_label: Run machine to clear carbon; check small valve under exhaust manifold if present
   result_type: pass_fail
-  photo_required: true
+  photo_required: false
   default_if_ambiguous: round_up
   pass_fail_criteria:
     pass: 'PASS: machine run, valve clear'

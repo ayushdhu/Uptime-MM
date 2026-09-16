@@ -33,6 +33,7 @@ export function HighSeverityFlowScreen() {
   const [plan, setPlan] = useState('');
   const [signerName, setSignerName] = useState('');
   const [signerRole, setSignerRole] = useState('owner');
+  const [initials, setInitials] = useState('');
   const [statement, setStatement] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -56,9 +57,10 @@ export function HighSeverityFlowScreen() {
   const allTicked = STEPS.every(s => checklist[s.key]);
   const decisionOk = outOfService === true || (outOfService === false && /^\d+$/.test(interval) && plan.trim().length > 0);
 
+  const initialsOk = initials.trim().length >= 1 && initials.trim().length <= 6;
   const sign = async (png: string) => {
-    if (!signerName.trim() || !statement.trim()) {
-      Alert.alert('Owner statement', 'Enter the signer name and their statement in their own words before signing.');
+    if (!signerName.trim() || !initialsOk) {
+      Alert.alert('Acknowledgment', 'Enter the signer name and have the owner type their initials before signing.');
       return;
     }
     setBusy(true);
@@ -75,7 +77,7 @@ export function HighSeverityFlowScreen() {
       recordHighSeverityEvent({
         inspection,
         item,
-        checklist: {...checklist, decision_recorded: true},
+        checklist: {...checklist, decision_recorded: true, owner_initials: initials.trim().toUpperCase()},
         outOfService: outOfService === true,
         recheckIntervalDays: outOfService ? null : parseInt(interval, 10),
         repairPlan: outOfService ? null : plan,
@@ -88,6 +90,7 @@ export function HighSeverityFlowScreen() {
       setInterval_('');
       setPlan('');
       setStatement('');
+      setInitials('');
       if (rest.length === 0) {
         nav.replace('Checkout', {inspectionId: params.inspectionId});
       }
@@ -117,7 +120,7 @@ export function HighSeverityFlowScreen() {
         <Card>
           <Label>Conversation checklist</Label>
           {STEPS.slice(0, 3).map(s => (
-            <Checkbox key={s.key} checked={checklist[s.key]} label={s.label} onToggle={() => setChecklist(c => ({...c, [s.key]: !c[s.key]}))} />
+            <Checkbox key={s.key} checked={Boolean(checklist[s.key])} label={s.label} onToggle={() => setChecklist(c => ({...c, [s.key]: !c[s.key]}))} />
           ))}
           <Label>Decision: machine out of service?</Label>
           <View style={styles.row}>
@@ -142,9 +145,15 @@ export function HighSeverityFlowScreen() {
               <Button key={r} title={r} kind={signerRole === r ? 'primary' : 'secondary'} onPress={() => setSignerRole(r)} style={{flex: 1}} />
             ))}
           </View>
-          <Label>Owner statement, in their own words</Label>
-          <Input value={statement} onChangeText={setStatement} multiline placeholder="Exactly as the owner says it" style={{minHeight: 70}} />
-          <SignaturePad onCaptured={sign} />
+          <Text style={styles.blurb}>
+            By initialling and signing, the owner confirms they understand what was found and what Uptime recommended, and that
+            deciding what to do about it is theirs to make.
+          </Text>
+          <Label>Owner initials (required)</Label>
+          <Input value={initials} onChangeText={t => setInitials(t.slice(0, 6))} placeholder="e.g. JD" autoCapitalize="characters" maxLength={6} style={styles.initials} />
+          <Label>Owner statement, in their own words (optional)</Label>
+          <Input value={statement} onChangeText={setStatement} multiline placeholder="Only if the owner wants something recorded, e.g. why they are running it anyway" style={styles.statement} />
+          {initialsOk && signerName.trim() ? <SignaturePad onCaptured={sign} /> : <Muted>Signature pad unlocks once the name and initials are entered.</Muted>}
           {busy ? <Muted>Saving…</Muted> : null}
         </Card>
       </ScrollView>
@@ -156,4 +165,7 @@ const styles = StyleSheet.create({
   finding: {fontSize: 17, color: colors.text, fontWeight: '600'},
   photo: {width: 160, height: 160, borderRadius: 8, marginRight: 8, backgroundColor: '#ddd'},
   row: {flexDirection: 'row', gap: 10},
+  blurb: {fontSize: 15, color: colors.text, marginTop: 4, marginBottom: 4},
+  initials: {fontSize: 26, fontWeight: '700', letterSpacing: 4, maxWidth: 200},
+  statement: {minHeight: 70},
 });

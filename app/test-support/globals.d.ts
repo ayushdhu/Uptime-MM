@@ -5,3 +5,7 @@ declare class TextEncoder {
 declare class TextDecoder {
   decode(input: ArrayBuffer | ArrayBufferView): string;
 }
+
+// Node's Buffer is available under jest; typed loosely so tests can build byte-exact fixtures.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const Buffer: any;
