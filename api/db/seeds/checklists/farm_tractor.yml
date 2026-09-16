@@ -1,0 +1,655 @@
+# GENERATED from the PM checklist workbook by docs/checklists/xlsx_to_yaml.py.
+# Edit the workbook (or this file deliberately), then re-seed. Published templates are immutable:
+# a content change must ship as a new `version`.
+machine_class: farm_tractor
+drive_type: null
+has_def: null
+version: alpha-1
+source: uptime_pm_checklists_alpha1.xlsx / tab 'Farm Tractor'
+items:
+- key: rear_pto_engage_disengage_shields_and_guards
+  component: Rear PTO (engage/disengage, shields and guards)
+  section: PTO
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function + visual
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: engages and disengages cleanly, shield and guard present'
+    fail: 'FAIL: will not engage/disengage, or shield/guard missing or damaged'
+  measurement: null
+  notes_to_tech: 'Source: John Deere operator manuals.'
+- key: mid_pto_if_equipped
+  component: Mid PTO (if equipped)
+  section: PTO
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function + visual
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: engages and disengages cleanly, guard present'
+    fail: 'FAIL: fault or guard missing'
+  measurement: null
+  notes_to_tech: null
+- key: pto_operator_on_seat_off_seat_interlocks
+  component: PTO operator on seat / off seat interlocks
+  section: Safety
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: PTO behaves per manual on and off seat'
+    fail: 'FAIL: interlock does not cut PTO as designed'
+  measurement: null
+  notes_to_tech: null
+- key: neutral_start_switch
+  component: Neutral start switch
+  section: Safety
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: engine will not crank in gear'
+    fail: 'FAIL: cranks in gear'
+  measurement: null
+  notes_to_tech: null
+- key: pto_switch_test
+  component: PTO switch test
+  section: Safety
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: engine will not crank with PTO engaged'
+    fail: 'FAIL: cranks with PTO engaged'
+  measurement: null
+  notes_to_tech: null
+- key: seat_switch
+  component: Seat switch
+  section: Safety
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: engine stops / PTO stops when operator leaves seat as designed'
+    fail: 'FAIL: no shutdown'
+  measurement: null
+  notes_to_tech: null
+- key: brake_pedals_and_park_brake
+  component: Brake pedals and park brake
+  section: Safety
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: firm, even, park brake holds'
+    fail: 'FAIL: spongy, uneven, or park brake will not hold'
+  measurement: null
+  notes_to_tech: null
+- key: lights_flashers_smv_emblem
+  component: Lights, flashers, SMV emblem
+  section: Safety
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function + visual
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: all work, emblem present'
+    fail: 'FAIL: any out or emblem missing'
+  measurement: null
+  notes_to_tech: null
+- key: rops_and_seat_belt
+  component: ROPS and seat belt
+  section: Safety
+  walkthrough_group: Safety Interlocks and PTO (pass/fail)
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Visual + function
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: ROPS undamaged, belt latches and retracts'
+    fail: 'FAIL: damage or belt fault'
+  measurement: null
+  notes_to_tech: null
+- key: 3_point_hitch_lift_arms_lower_links_top_link
+  component: 3 point hitch (lift arms, lower links, top link)
+  section: Hitch
+  walkthrough_group: Hitch and Implement
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Function + play check
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: No play, lifts smoothly.
+    medium: Minor play or slow response.
+    high: Significant play, will not hold position, or visible damage.
+  measurement: null
+  notes_to_tech: null
+- key: drawbar_hitch_quick_attach_hitch_if_equipped
+  component: Drawbar hitch / quick attach hitch (if equipped)
+  section: Hitch
+  walkthrough_group: Hitch and Implement
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Visual + play check
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: play
+  measurement: null
+  notes_to_tech: 'Shared: Play.'
+- key: implement_hydraulic_hoses_and_couplers_scvs
+  component: Implement hydraulic hoses and couplers (SCVs)
+  section: Hydraulics
+  walkthrough_group: Hitch and Implement
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: hose
+  measurement: null
+  notes_to_tech: 'Shared: Hoses.'
+- key: loader_cylinders_and_hoses_if_equipped
+  component: Loader cylinders and hoses (if equipped)
+  section: Hydraulics
+  walkthrough_group: Hitch and Implement
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: cyl
+  measurement: null
+  notes_to_tech: 'Shared: Hydraulic cylinder.'
+- key: grease_points_hitch_loader_steering_axle_pivot
+  component: Grease points (hitch, loader, steering, axle pivot)
+  section: Lubrication
+  walkthrough_group: Hitch and Implement
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Grease all points
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: pins
+  measurement: null
+  notes_to_tech: 'Shared: Pins and bushings.'
+- key: front_tires_pressure_each_tire
+  component: 'Front tires: pressure each tire'
+  section: Undercarriage
+  walkthrough_group: Tires, Wheels, Steering
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Gauge, log psi per tire
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: tire
+  measurement:
+    unit: psi
+    reference: null
+    flow: tire_refill_test
+  notes_to_tech: 'Shared: Tires. Front pressure differs from rear.'
+- key: rear_tires_pressure_each_tire
+  component: 'Rear tires: pressure each tire'
+  section: Undercarriage
+  walkthrough_group: Tires, Wheels, Steering
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Gauge, log psi per tire
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: tire
+  measurement:
+    unit: psi
+    reference: null
+    flow: tire_refill_test
+  notes_to_tech: 'Shared: Tires.'
+- key: front_tire_tread_and_sidewall
+  component: Front tire tread and sidewall
+  section: Undercarriage
+  walkthrough_group: Tires, Wheels, Steering
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: tire
+  measurement: null
+  notes_to_tech: 'Shared: Tires.'
+- key: rear_tire_tread_and_sidewall
+  component: Rear tire tread and sidewall
+  section: Undercarriage
+  walkthrough_group: Tires, Wheels, Steering
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: tire
+  measurement: null
+  notes_to_tech: 'Shared: Tires.'
+- key: wheel_bolts_hardware_torque_front_and_rear
+  component: Wheel bolts / hardware torque (front and rear)
+  section: Undercarriage
+  walkthrough_group: Tires, Wheels, Steering
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Visual + physical
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: lug
+  measurement: null
+  notes_to_tech: 'Shared: Lug nuts.'
+- key: toe_in_adjustment
+  component: Toe in adjustment
+  section: Steering
+  walkthrough_group: Tires, Wheels, Steering
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: measurement
+  check_method_label: Measure vs spec
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: within spec'
+    fail: 'FAIL: out of range'
+  measurement: null
+  notes_to_tech: Flag if out of range.
+- key: steering_cylinder
+  component: Steering cylinder
+  section: Steering
+  walkthrough_group: Tires, Wheels, Steering
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual + steering response
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: cyl
+  measurement: null
+  notes_to_tech: 'Shared: Hydraulic cylinder. Any steering delay or binding = automatic High.'
+- key: front_axle_pivot_and_steering_components
+  component: Front axle pivot and steering components
+  section: Steering
+  walkthrough_group: Tires, Wheels, Steering
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: Play check
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: play
+  measurement: null
+  notes_to_tech: 'Shared: Play.'
+- key: hydrostatic_powrreverser_transmission_engagement
+  component: Hydrostatic / PowrReverser transmission engagement
+  section: Powertrain
+  walkthrough_group: Transmission and Powertrain
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function test
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: Smooth engagement, no slipping.
+    medium: Hesitation or delayed engagement.
+    high: Slipping, jerking, or failure to engage.
+  measurement: null
+  notes_to_tech: null
+- key: transmission_hydraulic_oil_level
+  component: Transmission / hydraulic oil level
+  section: Fluids
+  walkthrough_group: Transmission and Powertrain
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: fluid_level
+  check_method_label: Sight glass / dipstick
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: transmission_hydraulic_filter
+  component: Transmission / hydraulic filter
+  section: Consumables
+  walkthrough_group: Transmission and Powertrain
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Replace on interval
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: front_axle_oil_mfwd
+  component: Front axle oil (MFWD)
+  section: Fluids
+  walkthrough_group: Transmission and Powertrain
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: fluid_level
+  check_method_label: Level plug
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: underneath_machine_leaks_damage
+  component: Underneath machine (leaks, damage)
+  section: Structure
+  walkthrough_group: Transmission and Powertrain
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: leak
+  measurement: null
+  notes_to_tech: 'Shared: Leak.'
+- key: engine_oil_level
+  component: Engine oil level
+  section: Fluids
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: fluid_level
+  check_method_label: Dipstick
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: engine_oil_change_oil_filter
+  component: Engine oil change + oil filter
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: monthly
+  cadence_label: Monthly / 100 Hr
+  check_method: visual
+  check_method_label: Change
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: coolant_level
+  component: Coolant level
+  section: Fluids
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Visual
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fluid
+  measurement:
+    unit: level_percent
+    reference: 100
+  notes_to_tech: 'Shared: Fluid level.'
+- key: radiator_and_screens_fin_blockage
+  component: Radiator and screens (fin blockage)
+  section: Cooling
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual + clean screens
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: fins
+  measurement: null
+  notes_to_tech: 'Shared: Fins. Farm debris packs screens fast.'
+- key: air_filter_restriction_indicator_dust_valve
+  component: Air filter (restriction indicator / dust valve)
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Read indicator, purge valve
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: fuel_filter_water_separator
+  component: Fuel filter / water separator
+  section: Consumables
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly (drain) / Monthly (replace)
+  check_method: visual
+  check_method_label: Drain, replace on interval
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: belts_fan_alternator_ac
+  component: Belts (fan, alternator, AC)
+  section: Belts
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: physical
+  check_method_label: 'PHYSICAL: tug / deflection'
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: belt
+  measurement: null
+  notes_to_tech: 'Shared: Belts.'
+- key: hoses_engine
+  component: Hoses (engine)
+  section: Engine
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: hose
+  measurement: null
+  notes_to_tech: 'Shared: Hoses.'
+- key: battery_terminals_mount_voltmeter
+  component: Battery (terminals, mount, voltmeter)
+  section: Electrical
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Visual + voltmeter
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: battery
+  measurement:
+    unit: volts
+    reference: 12.6
+    reference_24v: 25.2
+    flow: battery
+  notes_to_tech: 'Shared: Battery.'
+- key: electrical_connections_and_harness
+  component: Electrical connections and harness
+  section: Electrical
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: elec
+  measurement: null
+  notes_to_tech: 'Shared: Electrical connections.'
+- key: engine_compartment_main_components_alternator_starter_water
+  component: Engine compartment main components (alternator, starter, water pump, wiring)
+  section: Engine
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: visual
+  check_method_label: Visual
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: frame
+  measurement: null
+  notes_to_tech: Visual only.
+- key: def_tank_if_equipped
+  component: DEF tank (if equipped)
+  section: Fluids
+  walkthrough_group: Engine Compartment
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: fluid_level
+  check_method_label: Visual level + debris
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: Level adequate, no debris.
+    medium: Level low or minor debris.
+    high: Critically low or contamination risking SCR.
+  measurement:
+    unit: percent
+    reference: null
+  applies_when:
+    has_def: true
+  notes_to_tech: Uptime does NOT service DEF. Flag only.
+- key: gauges_indicators_instrument_panel
+  component: Gauges, indicators, instrument panel
+  section: Cab
+  walkthrough_group: Cab / Operator Station
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: function
+  check_method_label: Function at idle
+  result_type: pass_fail
+  photo_required: true
+  default_if_ambiguous: round_up
+  pass_fail_criteria:
+    pass: 'PASS: all function'
+    fail: 'FAIL: any dead or abnormal'
+  measurement: null
+  notes_to_tech: null
+- key: cab_air_filter_if_cab
+  component: Cab air filter (if cab)
+  section: Consumables
+  walkthrough_group: Cab / Operator Station
+  cadence: monthly
+  cadence_label: Monthly
+  check_method: visual
+  check_method_label: Clear or replace
+  result_type: tiered
+  photo_required: true
+  default_if_ambiguous: round_up
+  criteria_ref: filter
+  measurement: null
+  notes_to_tech: 'Shared: Filters.'
+- key: startup_diagnostic_codes
+  component: Startup diagnostic codes
+  section: Cab
+  walkthrough_group: Cab / Operator Station
+  cadence: weekly
+  cadence_label: Weekly
+  check_method: measurement
+  check_method_label: Read at startup
+  result_type: measurement
+  photo_required: true
+  default_if_ambiguous: round_up
+  tier_criteria:
+    low: No codes.
+    medium: Code displayed, logged verbatim.
+    high: Code with derate or warning lamp. Logged verbatim.
+  measurement:
+    unit: code_count
+    reference: 0
+  notes_to_tech: Log only.
