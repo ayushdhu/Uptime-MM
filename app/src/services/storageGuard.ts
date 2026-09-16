@@ -1,0 +1,27 @@
+import RNFS from 'react-native-fs';
+
+export const WARN_BELOW_BYTES = 2 * 1024 * 1024 * 1024; // 2 GB
+export const BLOCK_BELOW_BYTES = 500 * 1024 * 1024; // 500 MB
+
+export type StorageVerdict = {level: 'ok' | 'warn' | 'block'; freeBytes: number; message: string};
+
+export function judgeFreeSpace(freeBytes: number): StorageVerdict {
+  const gb = (freeBytes / 1024 ** 3).toFixed(1);
+  if (freeBytes < BLOCK_BELOW_BYTES) {
+    return {
+      level: 'block',
+      freeBytes,
+      message: `Only ${gb} GB free. Sync now or free space before starting a walkthrough. Photos would fail mid walk.`,
+    };
+  }
+  if (freeBytes < WARN_BELOW_BYTES) {
+    return {level: 'warn', freeBytes, message: `${gb} GB free. Sync soon to keep room for photos.`};
+  }
+  return {level: 'ok', freeBytes, message: `${gb} GB free.`};
+}
+
+/** Spec 7.8: warn below 2 GB, block below 500 MB, before starting a walkthrough. */
+export async function checkFreeSpace(): Promise<StorageVerdict> {
+  const info = await RNFS.getFSInfo();
+  return judgeFreeSpace(Number(info.freeSpace));
+}
